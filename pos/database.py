@@ -1,3 +1,4 @@
+import hashlib
 import mysql.connector
 
 class Database:
@@ -7,50 +8,52 @@ class Database:
         self.password = password
         self.database = database
 
-    # Connect to the database (return connection)
+        self.conn = None
+        self.cursor = None
+
+        self.connect_db()
+
+    # Connect to the database (Establish self.conn with database).
     def connect_db(self):
         try:
-            conn = mysql.connector.connect(
+            self.conn = mysql.connector.connect(
                 host=self.host,
                 user=self.username,
                 password=self.password,
                 database=self.database
             )
-            if conn.is_connected():
-                return conn
+            print("--> Database connection established successfully!")
         except mysql.connector.Error as e:
             raise Exception(f"Database connection failed: {e}")
 
     # Execute a query (return result if fetch=True, fetchone=True, or None)
     def execute_query(self, query, params=None, fetchall=False, fetchone=False):
-        conn = None
-        cursor = None
+        # Check if the database connection is established or not.
+        if not self.conn:
+            self.connect_db()
+        
         try:
-            conn = self.connect_db()
-            cursor = conn.cursor(dictionary=True)
-            
+            self.cursor = self.conn.cursor(dictionary=True)
             # Execute query with or without parameters
             if params:
-                cursor.execute(query, params)
+                self.cursor.execute(query, params)
             else:
-                cursor.execute(query)
+                self.cursor.execute(query)
             
             # Handle fetching data for SELECT queries
             if fetchall:
-                return cursor.fetchall()
+                return self.cursor.fetchall()
             elif fetchone:
-                return cursor.fetchone()
+                return self.cursor.fetchone()
             
             # Commit changes for non-SELECT queries
-            conn.commit()
+            self.conn.commit()
         except mysql.connector.Error as e:
             raise Exception(f"Query execution failed: {e}")
         finally:
-            # Ensure cursor and connection are always closed
-            if cursor:
-                cursor.close()
-            if conn:
-                conn.close()
+            # Ensure cursor is always closed after execution
+            if self.cursor:
+                self.cursor.close()
 
     # Initialize all tables for database
     def initialize_tables(self):
@@ -133,8 +136,9 @@ class Database:
 
     # Add a user
     def add_user(self, name, username, password, role):
+        hash_password = self.hash_password(password)
         query = "INSERT INTO users(name, username, password, role) VALUES(%s, %s, %s, %s)"
-        params = (name, username, password, role)
+        params = (name, username, hash_password, role)
         try:
             self.execute_query(query, params)
             print(f"-->{name} ({role}) has been added into the database successfully!")
@@ -163,9 +167,25 @@ class Database:
             return None
         
     # Update a user
-    def update_user(self, username, name, password, role):
-        query = "UPDATE users SET name=%s, password=%s, role=%s WHERE username=%s"
-        params = (name, password, role, username)
+    def update_user(self, username=None, name=None, password=None, role=None, status=None):
+        query = "UPDATE users SET "
+        params = []
+        if name:
+            query += "name=%s, "
+            params.append(name)
+        if password:
+            query += "password=%s, "
+            params.append(self.hash_password(password))
+        if role:
+            query += "role=%s, "
+            params.append(role)
+        if status:
+            query += "status=%s, "
+            params.append(status)
+
+        query = query.rstrip(", ") + " WHERE username=%s"
+        params.append(username)
+
         try:
             self.execute_query(query, params)
             print(f"-->{username} has been updated successfully!")
@@ -182,17 +202,36 @@ class Database:
         except Exception as e:
             print(f"--> Error deleting user: {e}")
 
+    # Clear all users except admin
+    def clear_all_users(self):
+        query = "DELETE FROM users WHERE username!='admin'"
+        try:
+            self.execute_query(query)
+            print("--> All users except admin have been cleared successfully!")
+        except Exception as e:
+            print(f"--> Error clearing users: {e}")
+
     # Authenticate
     def authenticate_user(self, username, password):
+        hash_password = self.hash_password(password)
         query = "SELECT * FROM users WHERE username=%s AND password=%s"
-        params = (username, password)
+        params = (username, hash_password)
         try:
             result = self.execute_query(query, params, fetchone=True)
-            return result
+            # check user status
+            if result and result["status"] == "Active":
+                return result
+            else:
+                print("--> Invalid credentials or user status is not active.")
+                return False
         except Exception as e:
             print(f"--> Error authenticating user: {e}")
             return False
-            
+
+    # Hash a password
+    def hash_password(self, password):
+        return hashlib.sha256(password.encode()).hexdigest()
+
     # Add a product
     def add_product(self, name, sku, barcode, description, price, stock_quantity, category_id):
         query = "INSERT INTO products(name, sku, barcode, description, price, stock_quantity, category_id) VALUES(%s, %s, %s, %s, %s, %s, %s)"
@@ -529,8 +568,10 @@ class Database:
 
     # Close the database connection
     def close_connection(self):
-        self.cursor.close()
-        self.connection.close()
+        if self.cursor:
+            self.cursor.close()
+        if self.conn:
+            self.conn.close()
         print("Database connection closed successfully!")
 
 if __name__ == "__main__":
