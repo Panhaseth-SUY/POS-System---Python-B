@@ -1,5 +1,7 @@
 import hashlib
 import mysql.connector
+import pandas as pd
+from PyQt5.QtWidgets import QApplication, QFileDialog
 
 class Database:
     def __init__(self, host="127.0.0.1", username="root", password="Tokata@se7en232722", database="POS_DB"):
@@ -83,18 +85,18 @@ class Database:
             sku VARCHAR(50) NOT NULL UNIQUE,
             barcode VARCHAR(50) NOT NULL UNIQUE,
             description TEXT,
-            price DECIMAL(10, 2) NOT NULL,
-            stock_quantity INT NOT NULL,
+            price DECIMAL(10, 2) NOT NULL CHECK(price >= 0),
+            stock_quantity INT NOT NULL CHECK(stock_quantity >= 0),
             category_id INT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            FOREIGN KEY (category_id) REFERENCES categories(id)
+            FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
             )""",
 
             """CREATE TABLE IF NOT EXISTS sales (
             id INT AUTO_INCREMENT PRIMARY KEY,
             date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            total_amount DECIMAL(10, 2) NOT NULL,
+            total_amount DECIMAL(10, 2) NOT NULL CHECK(total_amount >= 0),
             cashier_id INT,
             payment_method ENUM('Cash', 'Card', 'Digital Wallet') NOT NULL,
             status ENUM('Completed', 'Pending', 'Canceled') DEFAULT 'Completed',
@@ -108,24 +110,13 @@ class Database:
             sale_id INT,
             product_id INT,
             quantity INT NOT NULL,
-            unit_price DECIMAL(10, 2) NOT NULL,
-            subtotal DECIMAL(10, 2) NOT NULL, -- quantity * unit_price
+            unit_price DECIMAL(10, 2) NOT NULL CHECK (unit_price >= 0),
+            subtotal DECIMAL(10, 2) NOT NULL CHECK (subtotal >= 0), -- quantity * unit_price
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            FOREIGN KEY (sale_id) REFERENCES sales(id),
+            FOREIGN KEY (sale_id) REFERENCES sales(id) ON DELETE CASCADE,
             FOREIGN KEY (product_id) REFERENCES products(id)
             )""",
-
-            """CREATE TABLE IF NOT EXISTS inventory_logs (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            product_id INT,
-            change_quantity INT NOT NULL,
-            reason VARCHAR(255), -- e.g., "Restock", "Sale", "Adjustment"
-            date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            FOREIGN KEY (product_id) REFERENCES products(id)
-            )"""
         ]
         try:
             for query in queries:
@@ -134,7 +125,7 @@ class Database:
         except Exception as e:
             print(f"--> Error initializing tables: {e}")
 
-    # Add a user
+    ### Add a user -----------------------------------------------------
     def add_user(self, name, username, password, role):
         hash_password = self.hash_password(password)
         query = "INSERT INTO users(name, username, password, role) VALUES(%s, %s, %s, %s)"
@@ -204,7 +195,7 @@ class Database:
 
     # Clear all users except admin
     def clear_all_users(self):
-        query = "DELETE FROM users WHERE username!='admin'"
+        query = "DELETE FROM users WHERE role!='admin'"
         try:
             self.execute_query(query)
             print("--> All users except admin have been cleared successfully!")
@@ -232,7 +223,7 @@ class Database:
     def hash_password(self, password):
         return hashlib.sha256(password.encode()).hexdigest()
 
-    # Add a product
+    ### Add a product ----------------------------------------------------------------
     def add_product(self, name, sku, barcode, description, price, stock_quantity, category_id):
         query = "INSERT INTO products(name, sku, barcode, description, price, stock_quantity, category_id) VALUES(%s, %s, %s, %s, %s, %s, %s)"
         params = (name, sku, barcode, description, price, stock_quantity, category_id)
@@ -241,6 +232,41 @@ class Database:
             print(f"-->Product: ({name}) has been added into the database successfully!")
         except Exception as e:
             print(f"--> Error inserting product: {e}")
+
+    # Add products from dataset (csv, excel)
+    def add_products_from_dataset(self):
+        # Ask the user to select a dataset file
+        app = QApplication([])
+        options = QFileDialog.Options()
+        dataset, _ = QFileDialog.getOpenFileName(None, "Select Dataset", "", "CSV Files (*.csv);;Excel Files (*.xlsx)", options=options)
+        app.exit()
+        
+        # Check for file type
+        if dataset.endswith(".csv"):
+            try:
+                data = pd.read_csv(dataset)
+                for index, row in data.iterrows():
+                    # Get category id
+                    category = self.fetch_category_by_name(row["category_name"])
+                    if category:
+                        category_id = category["id"]
+                        self.add_product(row["name"], row["sku"], row["barcode"], row.get("description", None), row["price"], row["stock_quantity"], category_id)
+            except Exception as e:
+                print(f"--> Error adding products from dataset: {e}")
+                
+        elif dataset.endswith(".xlsx"):
+            try:
+                data = pd.read_excel(dataset)
+                for index, row in data.iterrows():
+                    # Get category id
+                    category = self.fetch_category_by_name(row["category_name"])
+                    if category:
+                        category_id = category
+                        self.add_product(row["name"], row["sku"], row["barcode"], row.get("description", None), row["price"], row["stock_quantity"], category_id)
+            except Exception as e:
+                print(f"--> Error adding products from dataset: {e}")
+        else:
+            print("--> Invalid file type. Only csv, and excel files are supported.")
 
     # Fetch all products
     def fetch_all_products(self):
@@ -252,6 +278,26 @@ class Database:
             print(f"--> Error fetching products: {e}")
             return None
     
+    # Save products table to excel file
+    def save_products_table_as_excel_file(self):
+        query = "SELECT * FROM products"
+        try:
+            results = self.execute_query(query, fetchall=True)
+            df = pd.DataFrame(results)
+            # Create a QApplication instance
+            app = QApplication([])
+            # Ask the user for the file path and name to save the Excel file
+            options = QFileDialog.Options()
+            filename, _ = QFileDialog.getSaveFileName(None, "Save Excel File", "", "Excel files (*.xlsx)", options=options)
+
+            # Exit the application
+            app.exit()
+
+            df.to_excel(filename, index=False)
+            print("--> Products table has been saved to excel successfully!")
+        except Exception as e:
+            print(f"--> Error saving products to excel: {e}")
+
     # Fetch a product by ID
     def fetch_product_by_id(self, product_id):
         query = "SELECT * FROM products WHERE id=%s"
@@ -262,7 +308,7 @@ class Database:
         except Exception as e:
             print(f"--> Error fetching product by ID: {e}")
             return None
-        
+
     # Update a product
     def update_product(self, product_id, name=None, sku=None, barcode=None, description=None, price=None, stock_quantity=None, category_id=None):
         query = "UPDATE products SET "
@@ -309,7 +355,16 @@ class Database:
         except Exception as e:
             print(f"--> Error deleting product: {e}")
 
-    # Add a category
+    # Clear all products
+    def clear_all_products(self):
+        query = "DELETE FROM products"
+        try:
+            self.execute_query(query)
+            print("--> All products have been cleared successfully!")
+        except Exception as e:
+            print(f"--> Error clearing products: {e}")
+
+    ### Add a category --------------------------------------------------------------
     def add_category(self, name, description=None):
         query = "INSERT INTO categories(name, description) VALUES(%s, %s)"
         params = (name, description)
@@ -318,6 +373,33 @@ class Database:
             print(f"-->Category: ({name}) has been added into the database successfully!")
         except Exception as e:
             print(f"--> Error inserting category: {e}")
+
+    # Add categories from dataset (csv, excel)
+    def add_categories_from_dataset(self):
+        # Ask the user to select a dataset file
+        app = QApplication([])
+        options = QFileDialog.Options()
+        dataset, _ = QFileDialog.getOpenFileName(None, "Select Dataset", "", "CSV Files (*.csv);;Excel Files (*.xlsx)", options=options)
+        app.exit()
+        
+        # Check for file type
+        if dataset.endswith(".csv"):
+            try:
+                data = pd.read_csv(dataset)
+                for index, row in data.iterrows():
+                    self.add_category(row["name"], row.get("description", None))
+            except Exception as e:
+                print(f"--> Error adding categories from dataset: {e}")
+                
+        elif dataset.endswith(".xlsx"):
+            try:
+                data = pd.read_excel(dataset)
+                for index, row in data.iterrows():
+                    self.add_category(row["name"], row.get("description", None))
+            except Exception as e:
+                print(f"--> Error adding categories from dataset: {e}")
+        else:
+            print("--> Invalid file type. Only csv, and excel files are supported.")
 
     # Fetch all categories
     def fetch_all_categories(self):
@@ -339,7 +421,18 @@ class Database:
         except Exception as e:
             print(f"--> Error fetching category by ID: {e}")
             return None
-        
+
+    # Fetch a category by name
+    def fetch_category_by_name(self, name):
+        query = "SELECT * FROM categories WHERE name=%s"
+        params = (name,)
+        try:
+            result = self.execute_query(query, params, fetchone=True)
+            return result
+        except Exception as e:
+            print(f"--> Error fetching category by name: {e}")
+            return None
+
     # Update a category
     def update_category(self, category_id, name, description=None):
         query = "UPDATE categories SET name=%s"
@@ -368,15 +461,31 @@ class Database:
         except Exception as e:
             print(f"--> Error deleting category: {e}")
 
-    # Add a sale
+    # Clear all categories
+    def clear_all_categories(self):
+        query = "DELETE FROM categories"
+        try:
+            self.execute_query(query)
+            print("--> All categories have been cleared successfully!")
+        except Exception as e:
+            print(f"--> Error clearing categories: {e}")
+
+    ### Add a sale --------------------------------------------------------------
     def add_sale(self, total_amount, cashier_id, payment_method):
         query = "INSERT INTO sales(total_amount, cashier_id, payment_method) VALUES(%s, %s, %s)"
         params = (total_amount, cashier_id, payment_method)
         try:
             self.execute_query(query, params)
-            print(f"-->Sale by cashier({cashier_id}) has been added into the database successfully!")
+            # get last sale id from the database
+            sale_id = self.get_last_sale_id()
+
+            print(f"-->Sale({sale_id}) by cashier({cashier_id}) has been added into the database successfully!")
         except Exception as e:
             print(f"--> Error inserting sale: {e}")
+    
+    # Get a sale id from the database
+    def get_last_sale_id(self):
+        return self.execute_query("SELECT LAST_INSERT_ID() AS id", fetchone=True)["id"]
 
     # Fetch all sales
     def fetch_all_sales(self):
@@ -432,7 +541,16 @@ class Database:
         except Exception as e:
             print(f"--> Error deleting sale: {e}")
 
-    # Add a sale item
+    # Clear all sales
+    def clear_all_sales(self):
+        query = "DELETE FROM sales"
+        try:
+            self.execute_query(query)
+            print("--> All sales have been cleared successfully!")
+        except Exception as e:
+            print(f"--> Error clearing sales: {e}")
+
+    ### Add a sale item --------------------------------------------------------------
     def add_sale_item(self, sale_id, product_id, quantity, unit_price, subtotal):
         query = "INSERT INTO sales_items(sale_id, product_id, quantity, unit_price, subtotal) VALUES(%s, %s, %s, %s, %s)"
         params = (sale_id, product_id, quantity, unit_price, subtotal)
@@ -503,68 +621,14 @@ class Database:
         except Exception as e:
             print(f"--> Error deleting sale item: {e}")
 
-    # Add an inventory log
-    def add_inventory_log(self, product_id, change_quantity, reason):
-        query = "INSERT INTO inventory_logs(product_id, change_quantity, reason) VALUES(%s, %s, %s)"
-        params = (product_id, change_quantity, reason)
+    # Clear all sale items
+    def clear_all_sale_items(self):
+        query = "DELETE FROM sales_items"
         try:
-            self.execute_query(query, params)
-            print(f"--> Inventory Log: ({product_id}) has been added into the database successfully!")
+            self.execute_query(query)
+            print("--> All sale items have been cleared successfully!")
         except Exception as e:
-            print(f"--> Error inserting inventory log: {e}")
-
-    # Fetch all inventory logs
-    def fetch_all_inventory_logs(self):
-        query = "SELECT * FROM inventory_logs"
-        try:
-            results = self.execute_query(query, fetchall=True)
-            return results
-        except Exception as e:
-            print(f"--> Error fetching inventory logs: {e}")
-            return None
-        
-    # Fetch an inventory log by ID
-    def fetch_inventory_log_by_id(self, inventory_log_id):
-        query = "SELECT * FROM inventory_logs WHERE id=%s"
-        params = (inventory_log_id,)
-        try:
-            result = self.execute_query(query, params, fetchone=True)
-            return result
-        except Exception as e:
-            print(f"--> Error fetching inventory log by ID: {e}")
-            return None
-        
-    # Update an inventory log
-    def update_inventory_log(self, inventory_log_id, product_id=None, change_quantity=None, reason=None):
-        query = "UPDATE inventory_logs SET "
-        params = []
-
-        if product_id:
-            query += "product_id=%s, "
-            params.append(product_id)
-        if change_quantity:
-            query += "change_quantity=%s, "
-            params.append(change_quantity)
-        if reason:
-            query += "reason=%s "
-            params.append(reason)
-        query = query.rstrip(", ") + " WHERE id=%s"
-        params.append(inventory_log_id)
-        try:
-            self.execute_query(query, params)
-            print(f"--> Inventory Log: ({inventory_log_id}) has been updated successfully!")
-        except Exception as e:
-            print(f"--> Error updating inventory log: {e}")
-
-    # Delete an inventory log
-    def delete_inventory_log(self, inventory_log_id):
-        query = "DELETE FROM inventory_logs WHERE id=%s"
-        params = (inventory_log_id,)
-        try:
-            self.execute_query(query, params)
-            print(f"--> Inventory Log: ({inventory_log_id}) has been deleted successfully!")
-        except Exception as e:
-            print(f"--> Error deleting inventory log: {e}")
+            print(f"--> Error clearing sale items: {e}")
 
     # Close the database connection
     def close_connection(self):
