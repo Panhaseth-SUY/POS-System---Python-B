@@ -253,7 +253,7 @@ class Database:
                         self.add_product(row["name"], row["sku"], row["barcode"], row.get("description", None), row["price"], row["stock_quantity"], category_id)
             except Exception as e:
                 print(f"--> Error adding products from dataset: {e}")
-                
+
         elif dataset.endswith(".xlsx"):
             try:
                 data = pd.read_excel(dataset)
@@ -261,7 +261,7 @@ class Database:
                     # Get category id
                     category = self.fetch_category_by_name(row["category_name"])
                     if category:
-                        category_id = category
+                        category_id = category["id"]
                         self.add_product(row["name"], row["sku"], row["barcode"], row.get("description", None), row["price"], row["stock_quantity"], category_id)
             except Exception as e:
                 print(f"--> Error adding products from dataset: {e}")
@@ -277,13 +277,30 @@ class Database:
         except Exception as e:
             print(f"--> Error fetching products: {e}")
             return None
-    
+
     # Save products table to excel file
     def save_products_table_as_excel_file(self):
-        query = "SELECT * FROM products"
+        query1 = "SELECT * FROM products"
+        query2 = "SELECT * FROM categories"
         try:
-            results = self.execute_query(query, fetchall=True)
-            df = pd.DataFrame(results)
+            result1 = self.execute_query(query1, fetchall=True)
+            result2 = self.execute_query(query2, fetchall=True)
+            products = pd.DataFrame(result1)
+            categories = pd.DataFrame(result2)
+
+            # Drop unnecessary columns
+            products.drop(['created_at', 'updated_at'], axis=1, inplace=True)
+            categories.drop(['created_at', 'updated_at', 'description'], axis=1, inplace=True)
+
+            # Rename the category
+            categories.rename(columns={'id': 'category_id', 'name': 'category_name'}, inplace=True)
+
+            # Merge products and categories
+            excel = pd.merge(products, categories, on='category_id', how='left')
+
+            # Reorder the category columns
+            excel = excel[['id', 'name', 'sku', 'barcode', 'price', 'stock_quantity', 'category_name', 'description']]
+
             # Create a QApplication instance
             app = QApplication([])
             # Ask the user for the file path and name to save the Excel file
@@ -293,7 +310,8 @@ class Database:
             # Exit the application
             app.exit()
 
-            df.to_excel(filename, index=False)
+            # Save the dataframe to the Excel file
+            excel.to_excel(filename, index=False)
             print("--> Products table has been saved to excel successfully!")
         except Exception as e:
             print(f"--> Error saving products to excel: {e}")

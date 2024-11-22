@@ -104,7 +104,7 @@ if __name__ == '__main__':
     # db.add_product("Whiskey", "Whiskey-001", "Whiskey-001", "Whiskey", 5.00, 100, 12)
 
     # Add products from datasets
-    db.add_products_from_dataset()
+    # db.add_products_from_dataset()
 
     # fetch all products
     # pprint(db.fetch_all_products())
@@ -121,13 +121,17 @@ if __name__ == '__main__':
     # delete a product
     # db.delete_product(1)
 
+    # clear all products
+    # db.clear_all_products()
+
+
 ### Test sales table
     # Insert some sales by default into the database
     # (total_amount, cashier_id, payment_method)
-    # db.add_sale(10.00, 15, "Cash")
-    # db.add_sale(12.00, 16, "Card")
-    # db.add_sale(40.00, 17, "Digital Wallet")
-    # db.add_sale(45.00, 18, "Cash")
+    # db.add_sale(10.00, 3, "Cash")
+    # db.add_sale(12.00, 3, "Card")
+    # db.add_sale(40.00, 4, "Digital Wallet")
+    # db.add_sale(45.00, 7, "Cash")
 
     # fetch all sales
     # pprint(db.fetch_all_sales())
@@ -182,6 +186,7 @@ if __name__ == '__main__':
     # db.delete_sale_item(3)
 
 ### Test reports (do not implement yet) ###
+
     # Fetch total sales for each product
     # pprint(db.fetch_total_sales_per_product())
 
