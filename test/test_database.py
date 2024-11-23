@@ -133,8 +133,14 @@ if __name__ == '__main__':
     # db.add_sale(40.00, 4, "Digital Wallet")
     # db.add_sale(45.00, 7, "Cash")
 
+    # Add sales from datasets
+    # db.add_sales_from_dataset()
+
     # fetch all sales
     # pprint(db.fetch_all_sales())
+
+    # fecth sales from date range
+    # pprint(db.fetch_sales_by_date_range("2012-11-09 00:00:00", "2013-02-26 23:59:59"))
 
     # fetch a sale by id
     # pprint(db.fetch_sale_by_id(9))
@@ -144,6 +150,9 @@ if __name__ == '__main__':
 
     # delete a sale
     # db.delete_sale(9)
+
+    # clear all sales
+    # db.clear_all_sales()
 
 ### Test sale_items table
     # Insert some sale items by default into the database

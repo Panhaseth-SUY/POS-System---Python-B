@@ -2,7 +2,7 @@ import hashlib
 import mysql.connector
 import pandas as pd
 from PyQt5.QtWidgets import QApplication, QFileDialog
-
+import datetime
 class Database:
     def __init__(self, host="127.0.0.1", username="root", password="Tokata@se7en232722", database="POS_DB"):
         self.host = host
@@ -489,9 +489,9 @@ class Database:
             print(f"--> Error clearing categories: {e}")
 
     ### Add a sale --------------------------------------------------------------
-    def add_sale(self, total_amount, cashier_id, payment_method):
-        query = "INSERT INTO sales(total_amount, cashier_id, payment_method) VALUES(%s, %s, %s)"
-        params = (total_amount, cashier_id, payment_method)
+    def add_sale(self, total_amount, cashier_id, payment_method, date=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')):
+        query = "INSERT INTO sales(date, total_amount, cashier_id, payment_method) VALUES(%s, %s, %s, %s)"
+        params = (date, total_amount, cashier_id, payment_method)
         try:
             self.execute_query(query, params)
             # get last sale id from the database
@@ -499,8 +499,35 @@ class Database:
 
             print(f"-->Sale({sale_id}) by cashier({cashier_id}) has been added into the database successfully!")
         except Exception as e:
-            print(f"--> Error inserting sale: {e}")
-    
+           print(f"--> Error inserting sale: {e}")
+
+    # Add sales from dataset (csv, excel)
+    def add_sales_from_dataset(self):
+        # Ask the user to select a dataset file
+        app = QApplication([])
+        options = QFileDialog.Options()
+        dataset, _ = QFileDialog.getOpenFileName(None, "Select Dataset", "", "CSV Files (*.csv);;Excel Files (*.xlsx)", options=options)
+        app.exit()
+
+        # Check for file type
+        if dataset.endswith(".csv"):
+            try:
+                data = pd.read_csv(dataset)
+                for index, row in data.iterrows():
+                    self.add_sale(row["total_amount"], row["cashier_id"], row["payment_method"], row["date"])
+            except Exception as e:
+                print(f"--> Error adding sales from dataset: {e}")
+                
+        elif dataset.endswith(".xlsx"):
+            try:
+                data = pd.read_excel(dataset)
+                for index, row in data.iterrows():
+                    self.add_sale(row["total_amount"], row["cashier_id"], row["payment_method"], row["date"])
+            except Exception as e:
+                print(f"--> Error adding sales from dataset: {e}")
+        else:
+            print("--> Invalid file type. Only csv, and excel files are supported.")           
+
     # Get a sale id from the database
     def get_last_sale_id(self):
         return self.execute_query("SELECT LAST_INSERT_ID() AS id", fetchone=True)["id"]
@@ -514,7 +541,17 @@ class Database:
         except Exception as e:
             print(f"--> Error fetching sales: {e}")
             return None
-        
+
+    def fetch_sales_by_date_range(self, start_date, end_date):
+        query = "SELECT * FROM sales WHERE date BETWEEN %s AND %s"
+        params = (start_date, end_date)
+        try:
+            results = self.execute_query(query, params, fetchall=True)
+            return results
+        except Exception as e:
+            print(f"--> Error fetching sales by date range: {e}")
+            return None
+
     # Fetch a sale by ID
     def fetch_sale_by_id(self, sale_id):
         query = "SELECT * FROM sales WHERE id=%s"
