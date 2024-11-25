@@ -528,9 +528,15 @@ class Database:
         else:
             print("--> Invalid file type. Only csv, and excel files are supported.")           
 
-    # Get a sale id from the database
+    # Get last sale id 
     def get_last_sale_id(self):
-        return self.execute_query("SELECT LAST_INSERT_ID() AS id", fetchone=True)["id"]
+        query = "SELECT id FROM sales ORDER BY id DESC LIMIT 1"
+        try:
+            result = self.execute_query(query, fetchone=True)
+            return result["id"]
+        except Exception as e:
+            print(f"--> Error fetching last sale id: {e}")
+            return None
 
     # Fetch all sales
     def fetch_all_sales(self):
@@ -635,7 +641,18 @@ class Database:
         except Exception as e:
             print(f"--> Error fetching sale item by ID: {e}")
             return None
-        
+
+    # Fetch sale items by sale ID
+    def get_sale_items_data(self, sale_id):
+        query = "SELECT * FROM sales_items WHERE sale_id=%s"
+        params = (sale_id,)
+        try:
+            results = self.execute_query(query, params, fetchall=True)
+            return results
+        except Exception as e:
+            print(f"--> Error fetching sale items by sale ID: {e}")
+            return None
+
     # Update a sale item
     def update_sale_item(self, sale_item_id, sale_id=None, product_id=None, quantity=None, unit_price=None, subtotal=None):
         query = "UPDATE sales_items SET "

@@ -145,6 +145,9 @@ if __name__ == '__main__':
     # fetch a sale by id
     # pprint(db.fetch_sale_by_id(9))
 
+    # get last sale id 
+    # pprint(db.get_last_sale_id())
+
     # update a sale
     # db.update_sale(9, total_amount=12.00)
 
@@ -157,30 +160,50 @@ if __name__ == '__main__':
 ### Test sale_items table
     # Insert some sale items by default into the database
     # ( sale_id, product_id, quantity, unit_price, subtotal)
-    # db.add_sale_item(4, 10, 10, 0.75, 7.50)
-    # db.add_sale_item(4, 11, 10, 5.00, 50.00)
-    # db.add_sale_item(4, 12, 10, 3.00, 30.00)
-    # db.add_sale_item(4, 13, 10, 10.00, 100.00)
-    # db.add_sale_item(4, 34, 10, 6.00, 60.00)
-    # db.add_sale_item(4, 15, 10, 12.00, 120.00)
-    # db.add_sale_item(4, 16, 10, 1.00, 10.00)
-    # db.add_sale_item(4, 17, 10, 0.50, 5.00)
-    # db.add_sale_item(5, 18, 10, 0.75, 7.50)
-    # db.add_sale_item(5, 33, 10, 0.50, 5.00)
-    # db.add_sale_item(5, 25, 10, 1.00, 10.00)
-    # db.add_sale_item(5, 26, 10, 1.50, 15.00)
-    # db.add_sale_item(5, 27, 10, 0.75, 7.50)
-    # db.add_sale_item(5, 28, 10, 0.25, 2.50)
-    # db.add_sale_item(5, 29, 10, 1.00, 10.00)
-    # db.add_sale_item(5, 30, 10, 2.00, 20.00)
-    # db.add_sale_item(5, 31, 10, 10.00, 100.00)
-    # db.add_sale_item(5, 32, 10, 10.00, 100.00)
-    # db.add_sale_item(6, 35, 10, 1.00, 10.00)
-    # db.add_sale_item(6, 36, 10, 0.50, 5.00)
-    # db.add_sale_item(6, 37, 10, 0.75, 7.50)
-    # db.add_sale_item(6, 39, 10, 1.00, 10.00)
-    # db.add_sale_item(6, 40, 10, 1.50, 15.00)
-    # db.add_sale_item(6, 41, 10, 0.75, 7.50)
+    # db.add_sale_item(531, 2003, 10, 0.75, 7.50)
+    # db.add_sale_item(531, 2004, 10, 1.00, 10.00)
+    # db.add_sale_item(531, 2005, 10, 5.00, 50.00)
+    # db.add_sale_item(531, 2006, 10, 3.00, 30.00)
+    # db.add_sale_item(531, 2007, 10, 6.00, 60.00)
+    # db.add_sale_item(531, 2008, 10, 12.00, 120.00)
+    # db.add_sale_item(531, 2009, 10, 10.00, 100.00)
+    # db.add_sale_item(531, 2010, 10, 1.00, 10.00)
+    # db.add_sale_item(531, 2011, 10, 0.50, 5.00)
+    # db.add_sale_item(531, 2012, 10, 0.75, 7.50)
+    # db.add_sale_item(531, 2013, 10, 0.25, 2.50)
+    # db.add_sale_item(531, 2014, 10, 0.50, 5.00)
+    # db.add_sale_item(531, 2015, 10, 0.75, 7.50)
+    # db.add_sale_item(531, 2016, 10, 1.00, 10.00)
+    # db.add_sale_item(531, 2017, 10, 0.50, 5.00)
+    # db.add_sale_item(531, 2018, 10, 0.75, 7.50)
+    # db.add_sale_item(531, 2019, 10, 1.00, 10.00)
+    # db.add_sale_item(531, 2020, 10, 0.50, 5.00)
+    # db.add_sale_item(531, 2021, 10, 0.75, 7.50)
+    # db.add_sale_item(531, 2022, 10, 1.00, 10.00)
+    # db.add_sale_item(531, 2023, 10, 5.00, 50.00)
+    # db.add_sale_item(531, 2024, 10, 3.00, 30.00)
+    # db.add_sale_item(531, 2025, 10, 6.00, 60.00)
+    # db.add_sale_item(531, 2026, 10, 12.00, 120.00)
+    # db.add_sale_item(531, 2027, 10, 10.00, 100.00)
+    # db.add_sale_item(531, 2028, 10, 1.00, 10.00)
+    # db.add_sale_item(531, 2029, 10, 0.50, 5.00)
+    # db.add_sale_item(531, 2030, 10, 0.75, 7.50)
+    # db.add_sale_item(531, 2031, 10, 0.25, 2.50)
+    # db.add_sale_item(531, 2032, 10, 0.50, 5.00)
+    # db.add_sale_item(531, 2033, 10, 0.75, 7.50)
+    # db.add_sale_item(531, 2034, 10, 1.00, 10.00)
+    # db.add_sale_item(531, 2035, 10, 0.50, 5.00)
+    # db.add_sale_item(531, 2036, 10, 0.75, 7.50)
+    # db.add_sale_item(531, 2037, 10, 1.00, 10.00)
+    # db.add_sale_item(531, 2038, 10, 0.50, 5.00)
+
+
+
+
+
+
+
+
 
     # fetch all sale items
     # pprint(db.fetch_all_sale_items())

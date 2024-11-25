@@ -16,11 +16,12 @@ from collections import defaultdict
 
 
 class SaleReportGenerator:
-    def __init__(self):
+    def __init__(self, all_sale=False, date_start=None, date_end=None):
         self.db = Database()
+        self.generate(all_sale, date_start, date_end)
 
     # Generate sales report as PDF (Main Method)
-    def generate_sales_report_as_pdf(self, all_sale=False, date_start=None, date_end=None):
+    def generate(self, all_sale=False, date_start=None, date_end=None):
         # Fetch sales data
         if all_sale:
             data = self.fetch_all_sales()
@@ -120,6 +121,7 @@ class SaleReportGenerator:
         try:
             doc.build(elements, onFirstPage=self.cover_header_footer, onLaterPages=self.add_header_footer)
             print(f"Sales report generated successfully: {filename}")
+            self.db.close_connection()
         except Exception as e:
             print(f"Error generating PDF: {e}")
 
@@ -448,7 +450,7 @@ class SaleReportGenerator:
         canvas.drawString(30, 20, f"Generated on: {datetime.now().strftime('%d %b %Y, %H:%M:%S')}")
         canvas.drawString(520, 20, f"Page {doc.page - 1}")
         canvas.restoreState()
+        
 
 if __name__ == '__main__':
-    report_generator = SaleReportGenerator()
-    report_generator.generate_sales_report_as_pdf(date_start="2015-01-01", date_end="2022-12-31")
+    report_generator = SaleReportGenerator(date_start="2015-01-01", date_end="2023-12-31")
