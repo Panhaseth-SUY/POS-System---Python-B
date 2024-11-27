@@ -239,10 +239,8 @@ class Database:
     # Add products from dataset (csv, excel)
     def add_products_from_dataset(self):
         # Ask the user to select a dataset file
-        app = QApplication([])
         options = QFileDialog.Options()
         dataset, _ = QFileDialog.getOpenFileName(None, "Select Dataset", "", "CSV Files (*.csv);;Excel Files (*.xlsx)", options=options)
-        app.exit()
         
         # Check for file type
         if dataset.endswith(".csv"):
@@ -305,14 +303,9 @@ class Database:
             # Reorder the category columns
             excel = excel[['id', 'name', 'sku', 'barcode', 'price', 'stock_quantity', 'category_name', 'description']]
 
-            # Create a QApplication instance
-            app = QApplication([])
             # Ask the user for the file path and name to save the Excel file
             options = QFileDialog.Options()
             filename, _ = QFileDialog.getSaveFileName(None, "Save Excel File", "", "Excel files (*.xlsx)", options=options)
-
-            # Exit the application
-            app.exit()
 
             # Save the dataframe to the Excel file
             excel.to_excel(filename, index=False)
@@ -321,6 +314,17 @@ class Database:
             print(f"--> Error saving products to excel: {e}")
             raise Exception
         
+    # Search products by name
+    def search_products_by_name(self, name):
+        query = "SELECT * FROM products WHERE isDeleted=False AND name LIKE %s"
+        params = (f"%{name}%",)
+        try:
+            results = self.execute_query(query, params, fetchall=True)
+            return results
+        except Exception as e:
+            print(f"--> Error searching products by name: {e}")
+            return None
+
     # Fetch a product by ID
     def fetch_product_by_id(self, product_id):
         query = "SELECT * FROM products WHERE isDeleted=False AND id=%s"
@@ -387,6 +391,16 @@ class Database:
             print(f"--> Product: ({product_id}) has been soft deleted successfully!")
         except Exception as e:
             print(f"--> Error soft deleting product: {e}")
+
+    # Clear all products
+    def clear_products(self):
+        query = "UPDATE products SET isDeleted=True"
+        try:
+            self.execute_query(query)
+            print("--> All products have been soft deleted successfully!")
+        except Exception as e:
+            print(f"--> Error soft deleting all products: {e}")
+            raise Exception
 
     # Check if a product if it is referenced in the sales_items table
     def is_product_referenced(self, product_id):

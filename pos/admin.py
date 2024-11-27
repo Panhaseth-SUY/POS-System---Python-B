@@ -1,19 +1,14 @@
 from PyQt5.QtWidgets import (
-    QMainWindow, QApplication, QPushButton, QStackedWidget, QLabel, QTableWidget, QTableWidgetItem, QLineEdit
-    , QMessageBox
+    QMainWindow, QApplication, QPushButton, QStackedWidget, QLabel, QTableWidget, QTableWidgetItem, QLineEdit,
+    QMessageBox
 )
+from PyQt5.QtCore import Qt
 from PyQt5 import uic
 import sys
 from database import Database
 from add_product_dialog import AddProductDialog
 
-
 class Admin(QMainWindow):
-    """
-    Admin Panel for TOKATA POS System.
-    Provides functionality to manage products, categories, users, and settings.
-    """
-
     def __init__(self):
         super(Admin, self).__init__()
 
@@ -58,7 +53,7 @@ class Admin(QMainWindow):
         self.export_excel_button = self.findChild(QPushButton, 'export_excel_pushButton')
         self.import_excel_button = self.findChild(QPushButton, 'import_excel_pushButton')
         self.delete_product_button = self.findChild(QPushButton, 'delete_pushButton')
-        self.clear_product_button = self.findChild(QPushButton, 'clear_pushButton')
+        self.reload_button = self.findChild(QPushButton, 'reload_pushButton')
         self.search_product_lineedit = self.findChild(QLineEdit, 'search_product_lineEdit')
         self.search_product_button = self.findChild(QPushButton, 'search_product_pushButton')
 
@@ -87,7 +82,7 @@ class Admin(QMainWindow):
         self.export_excel_button.clicked.connect(self.export_excel)
         self.import_excel_button.clicked.connect(self.import_excel)
         self.delete_product_button.clicked.connect(self.delete_product)
-        self.clear_product_button.clicked.connect(self.clear_products)
+        self.reload_button.clicked.connect(self.reload_products)
         self.search_product_button.clicked.connect(self.search_product)
         self.search_product_lineedit.textChanged.connect(self.search_product)
 
@@ -97,15 +92,37 @@ class Admin(QMainWindow):
 
     # Product Management Functions
     def add_product(self):
-        """Open the Add Product dialog."""
         dialog = AddProductDialog(self)
         dialog.exec_()
         self.reload_products()  # Refresh the product list after adding a new product
 
     def edit_product(self):
-        """Edit the selected product."""
-        print("Edit Product")
+        # edit the selected product
+        selected_row = self.products_table.currentRow()
+        if selected_row < 0:
+            self._show_error_message("No selected product.")
+            return
 
+        product_id = self.products_table.item(selected_row, 0).text()
+        product_name = self.products_table.item(selected_row, 1).text()
+        product_stock_quantity = self.products_table.item(selected_row, 2).text()
+        product_price = self.products_table.item(selected_row, 3).text()
+        category = self.products_table.item(selected_row, 4).text()
+        product_sku = self.products_table.item(selected_row, 5).text()
+        product_barcode = self.products_table.item(selected_row, 6).text()
+        product_description = self.products_table.item(selected_row, 7).text()
+
+        category_id = self.db.fetch_category_by_name(category)
+        category_id = category_id['id']
+
+        try:
+            self.db.update_product(product_id=product_id, name=product_name, stock_quantity=product_stock_quantity, price=product_price, category_id=category_id, sku=product_sku, barcode=product_barcode, description=product_description)
+            self.reload_products()  # Refresh the product list after editing a product
+            self._show_info_message(f"Product ({product_id}) has been updated successfully")
+        except Exception as e:
+            print(f"Error editing product: {e}")
+            self._show_error_message("Failed to edit product.")
+        
     def export_excel(self):
         try:
             self.db.save_products_table_as_excel_file()
@@ -143,16 +160,76 @@ class Admin(QMainWindow):
             print(f"Error deleting product: {e}")
             self._show_error_message("Failed to delete product.")
         
-    def clear_products(self):
-        self.db.clear
-        
-
     def search_product(self):
-        """Search for a product."""
-        print("Search Product")
+        search_term = self.search_product_lineedit.text().strip().lower()
+        try:
+            if search_term:
+                # Filter products directly from the database
+                self.products = self.db.search_products_by_name(search_term)
+            else:
+                # If no search term, reload all products
+                self.products = self.db.fetch_all_products()
+            self.reload()
+        except Exception as e:
+            print(f"Error searching products: {e}")
+            self._show_error_message("Failed to search products.")
+
+    def reload(self):
+        # clear all products from table
+        self.products_table.clearContents()
+        self.products_table.setRowCount(0)
+        try:
+            # Set the row and column count dynamically
+            self.products_table.setRowCount(len(self.products)+28)
+
+            # Populate the table with data
+            for row_index, product in enumerate(self.products):
+                self.products_table.setItem(row_index, 0, QTableWidgetItem(str(product['id'])))
+                self.products_table.setItem(row_index, 1, QTableWidgetItem(product['name']))
+                self.products_table.setItem(row_index, 2, QTableWidgetItem(str(product['stock_quantity'])))
+                self.products_table.setItem(row_index, 3, QTableWidgetItem(f"{product['price']:.2f}"))
+                category = self.db.fetch_category_by_id(product['category_id'])
+                self.products_table.setItem(row_index, 4, QTableWidgetItem(category['name']))
+                self.products_table.setItem(row_index, 5, QTableWidgetItem(product['sku']))
+                self.products_table.setItem(row_index, 6, QTableWidgetItem(product['barcode']))
+                self.products_table.setItem(row_index, 7, QTableWidgetItem(product['description']))
+                self.products_table.setItem(row_index, 8, QTableWidgetItem(product['created_at'].strftime('%Y-%m-%d')))
+                self.products_table.setItem(row_index, 9, QTableWidgetItem(product['updated_at'].strftime('%Y-%m-%d')))
+
+            # Columns to make non-editable (e.g., ID)
+            non_editable_columns = {0,8,9}
+
+            # Populate the table with data
+            for row_index, product in enumerate(self.products):
+                for col_index, value in enumerate([
+                    str(product['id']),
+                    product['name'],
+                    str(product['stock_quantity']),
+                    f"{product['price']:.2f}",
+                    self.db.fetch_category_by_id(product['category_id'])['name'],
+                    product['sku'],
+                    product['barcode'],
+                    product['description'],
+                    product['created_at'].strftime('%Y-%m-%d'),
+                    product['updated_at'].strftime('%Y-%m-%d'),
+                ]):
+                    item = QTableWidgetItem(value)
+
+                    # Disable editing for specified columns
+                    if col_index in non_editable_columns:
+                        item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+
+                    self.products_table.setItem(row_index, col_index, item)
+
+            self.products_table.setSortingEnabled(True)
+        except Exception as e:
+            print(f"Error loading products: {e}")
+            self._show_error_message("Failed to load products.") 
 
     def reload_products(self):
-        """Fetch all products from the database and display them in the table widget."""
+        # clear all products from table
+        self.products_table.clearContents()
+        self.products_table.setRowCount(0)
         try:
             # Fetch all products from the database
             self.products = self.db.fetch_all_products()
@@ -161,7 +238,7 @@ class Admin(QMainWindow):
             headers = ["ID", "Name", "Stock Quantity", "Price", "Category", 
                        "SKU", "Barcode", "Description", "Created At", "Updated At"]
 
-            # Set the row and column count
+            # Set the row and column count dynamically
             self.products_table.setRowCount(len(self.products)+28)
             self.products_table.setColumnCount(len(headers))
             self.products_table.setHorizontalHeaderLabels(headers)
@@ -180,33 +257,53 @@ class Admin(QMainWindow):
                 self.products_table.setItem(row_index, 5, QTableWidgetItem(product['sku']))
                 self.products_table.setItem(row_index, 6, QTableWidgetItem(product['barcode']))
                 self.products_table.setItem(row_index, 7, QTableWidgetItem(product['description']))
-                self.products_table.setItem(row_index, 8, QTableWidgetItem(str(product['created_at'])))
-                self.products_table.setItem(row_index, 9, QTableWidgetItem(str(product['updated_at'])))
+                self.products_table.setItem(row_index, 8, QTableWidgetItem(product['created_at'].strftime('%Y-%m-%d')))
+                self.products_table.setItem(row_index, 9, QTableWidgetItem(product['updated_at'].strftime('%Y-%m-%d')))
 
-            # Select the first row by default
-            self.products_table.selectRow(0)
+            # Columns to make non-editable (e.g., ID)
+            non_editable_columns = {0,8,9}
 
-            # Adjust column widths for better readability
-            self.products_table.resizeColumnsToContents()
+            # Populate the table with data
+            for row_index, product in enumerate(self.products):
+                for col_index, value in enumerate([
+                    str(product['id']),
+                    product['name'],
+                    str(product['stock_quantity']),
+                    f"{product['price']:.2f}",
+                    self.db.fetch_category_by_id(product['category_id'])['name'],
+                    product['sku'],
+                    product['barcode'],
+                    product['description'],
+                    product['created_at'].strftime('%Y-%m-%d'),
+                    product['updated_at'].strftime('%Y-%m-%d'),
+                ]):
+                    item = QTableWidgetItem(value)
 
+                    # Disable editing for specified columns
+                    if col_index in non_editable_columns:
+                        item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+
+                    self.products_table.setItem(row_index, col_index, item)
+
+
+            self.products_table.setSortingEnabled(True)
         except Exception as e:
-            print(f"Error reloading products: {e}")
-
-    # Signout Functionality
-    def signout(self):
-        """Handle user sign-out."""
-        print("Sign Out")
-        self.close()
-
+            print(f"Error loading products: {e}")
+            self._show_error_message("Failed to load products.")
+    
     def _show_error_message(self, message):
+        """Display an error message to the user."""
         QMessageBox.critical(self, "Error", message)
 
     def _show_info_message(self, message):
-        QMessageBox.information(self, "Success", message)
+        """Display an informational message to the user."""
+        QMessageBox.information(self, "Information", message)
 
+    def signout(self):
+        """Handle user signout."""
+        self.close()
 
-# Application Entry Point
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = Admin()
+    admin_window = Admin()
     sys.exit(app.exec_())

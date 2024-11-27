@@ -16,6 +16,16 @@ if __name__ == '__main__':
     # db.add_user(name="Bob", username="Bob", password="bob123", role="cashier")
     # db.add_user(name="Charlie", username="Charlie", password="charlie123", role="cashier")
     # db.add_user(name="David", username="David", password="david123", role="cashier")
+    # db.add_user(name="Emily", username="Emily", password="emily123", role="cashier")
+    # db.add_user(name="Frank", username="Frank", password="frank123", role="cashier")
+    # db.add_user(name="Grace", username="Grace", password="grace123", role="cashier")
+    # db.add_user(name="Henry", username="Henry", password="henry123", role="cashier")
+    # db.add_user(name="Ivy", username="Ivy", password="ivy123", role="cashier")
+    # db.add_user(name="Jack", username="Jack", password="jack123", role="cashier")
+    # db.add_user(name="Karen", username="Karen", password="karen123", role="cashier")
+    # db.add_user(name="Lisa", username="Lisa", password="lisa123", role="cashier")
+    # db.add_user(name="Mary", username="Mary", password="mary123", role="cashier")
+
 
     # fetch all users
     # pprint(db.fetch_all_users())
