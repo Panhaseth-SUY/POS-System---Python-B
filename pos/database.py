@@ -75,6 +75,7 @@ class Database:
             id INT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(100) NOT NULL UNIQUE,
             description TEXT,
+            isDeleted BOOLEAN NOT NULL DEFAULT FALSE,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )""",
@@ -88,6 +89,7 @@ class Database:
             price DECIMAL(10, 2) NOT NULL CHECK(price >= 0),
             stock_quantity INT NOT NULL CHECK(stock_quantity >= 0),
             category_id INT,
+            isDeleted BOOLEAN NOT NULL DEFAULT FALSE,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
@@ -100,6 +102,7 @@ class Database:
             cashier_id INT,
             payment_method ENUM('Cash', 'Card', 'Digital Wallet') NOT NULL,
             status ENUM('Completed', 'Pending', 'Canceled') DEFAULT 'Completed',
+            isDeleted BOOLEAN NOT NULL DEFAULT FALSE,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (cashier_id) REFERENCES users(id)
@@ -115,7 +118,7 @@ class Database:
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (sale_id) REFERENCES sales(id) ON DELETE CASCADE,
-            FOREIGN KEY (product_id) REFERENCES products(id)
+            FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
             )""",
         ]
         try:
@@ -267,10 +270,11 @@ class Database:
                 print(f"--> Error adding products from dataset: {e}")
         else:
             print("--> Invalid file type. Only csv, and excel files are supported.")
+            raise Exception
 
     # Fetch all products
     def fetch_all_products(self):
-        query = "SELECT * FROM products"
+        query = "SELECT * FROM products WHERE isDeleted = False"
         try:
             results = self.execute_query(query, fetchall=True)
             return results
@@ -315,10 +319,11 @@ class Database:
             print("--> Products table has been saved to excel successfully!")
         except Exception as e:
             print(f"--> Error saving products to excel: {e}")
-
+            raise Exception
+        
     # Fetch a product by ID
     def fetch_product_by_id(self, product_id):
-        query = "SELECT * FROM products WHERE id=%s"
+        query = "SELECT * FROM products WHERE isDeleted=False AND id=%s"
         params = (product_id,)
         try:
             result = self.execute_query(query, params, fetchone=True)
@@ -373,14 +378,26 @@ class Database:
         except Exception as e:
             print(f"--> Error deleting product: {e}")
 
-    # Clear all products
-    def clear_all_products(self):
-        query = "DELETE FROM products"
+    # soft delete a product
+    def soft_delete_product(self, product_id):
+        query = "UPDATE products SET isDeleted=True WHERE id=%s"
+        params = (product_id,)
         try:
-            self.execute_query(query)
-            print("--> All products have been cleared successfully!")
+            self.execute_query(query, params)
+            print(f"--> Product: ({product_id}) has been soft deleted successfully!")
         except Exception as e:
-            print(f"--> Error clearing products: {e}")
+            print(f"--> Error soft deleting product: {e}")
+
+    # Check if a product if it is referenced in the sales_items table
+    def is_product_referenced(self, product_id):
+        query = "SELECT COUNT(*) as count FROM sales_items WHERE product_id = %s"
+        params = (product_id,)
+        try:
+            result = self.execute_query(query, params, fetchone=True)
+            return result['count'] > 0
+        except Exception as e:
+            print(f"--> Error checking if product is referenced: {e}")
+            return False
 
     ### Add a category --------------------------------------------------------------
     def add_category(self, name, description=None):
@@ -421,7 +438,7 @@ class Database:
 
     # Fetch all categories
     def fetch_all_categories(self):
-        query = "SELECT * FROM categories"
+        query = "SELECT * FROM categories WHERE isDeleted=False"
         try:
             results = self.execute_query(query, fetchall=True)
             return results
@@ -431,7 +448,7 @@ class Database:
         
     # Fetch a category by ID
     def fetch_category_by_id(self, category_id):
-        query = "SELECT * FROM categories WHERE id=%s"
+        query = "SELECT * FROM categories WHERE isDeleted=False AND id=%s"
         params = (category_id,)
         try:
             result = self.execute_query(query, params, fetchone=True)
@@ -442,7 +459,7 @@ class Database:
 
     # Fetch a category by name
     def fetch_category_by_name(self, name):
-        query = "SELECT * FROM categories WHERE name=%s"
+        query = "SELECT * FROM categories WHERE isDeleted=False AND name=%s"
         params = (name,)
         try:
             result = self.execute_query(query, params, fetchone=True)
@@ -478,6 +495,16 @@ class Database:
             print(f"-->Category: ({category_id}) has been deleted successfully!")
         except Exception as e:
             print(f"--> Error deleting category: {e}")
+
+    # soft delete a category
+    def soft_delete_category(self, category_id):
+        query = "UPDATE categories SET isDeleted=True WHERE id=%s"
+        params = (category_id,)
+        try:
+            self.execute_query(query, params)
+            print(f"--> Category: ({category_id}) has been soft deleted successfully!")
+        except Exception as e:
+            print(f"--> Error soft deleting category: {e}")
 
     # Clear all categories
     def clear_all_categories(self):
