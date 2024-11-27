@@ -1,7 +1,8 @@
 # Project Structure
+```
 pos_system/
 │
-├── pos_system/
+├── pos/
 │   ├── settings.py
 │   ├── urls.py
 │   └── wsgi.py
@@ -19,3 +20,4 @@ pos_system/
 │       └── css/style.css
 │
 └── manage.py
+```
