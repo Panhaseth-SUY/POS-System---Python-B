@@ -6,7 +6,9 @@ from PyQt5.QtCore import Qt
 from PyQt5 import uic
 import sys
 from database import Database
+from sale_report_generator import SaleReportGenerator
 from add_product_dialog import AddProductDialog
+from datetime import datetime
 
 class Admin(QMainWindow):
     def __init__(self):
@@ -30,6 +32,12 @@ class Admin(QMainWindow):
 
         # Populate the products table
         self.reload_products()
+
+        # Initialize the sale widget
+        self._initialize_sale_widget()
+
+        # Connect signals for sale management
+        self._connect_sale_signals()
 
         # Show the application
         self.show()
@@ -89,6 +97,153 @@ class Admin(QMainWindow):
     def _change_page(self, index):
         """Change the current page in the stacked widget."""
         self.stackedWidget.setCurrentIndex(index)
+
+
+    # Sale Management Functions
+    def _initialize_sale_widget(self):
+        # Initialize the sale widget here
+        self.date_start = self.findChild(QLabel, 'date_start_dateEdit')
+        self.date_end = self.findChild(QLabel, 'date_end_dateEdit')
+        self.update_sale_button = self.findChild(QPushButton, 'update_sale_pushButton')
+        self.sale_import_excel_button = self.findChild(QPushButton, 'sale_import_excel_pushButton')
+        self.sale_pdf_report_button = self.findChild(QPushButton, 'pdf_report_pushButton')
+        self.delete_sale_button = self.findChild(QPushButton, 'delete_sale_pushButton')
+        self.reload_sale_button = self.findChild(QPushButton, 'reload_pushButton_2')
+        self.search_sale_lineedit = self.findChild(QLineEdit, 'search_sale_lineEdit')
+        self.search_sale_button = self.findChild(QPushButton, 'search_sale_pushButton')
+        self.sales_table = self.findChild(QTableWidget, 'sales_table')
+
+        # Populate the sales table
+        self.reload_sales()
+
+    def _connect_sale_signals(self):
+        # Connect signals for sale management
+        self.update_sale_button.clicked.connect(self.update_sale)
+        self.sale_import_excel_button.clicked.connect(self.import_sale)
+        self.sale_pdf_report_button.clicked.connect(self.generate_pdf_report)
+        self.delete_sale_button.clicked.connect(self.delete_sale)
+        self.reload_sale_button.clicked.connect(self.reload_sales)
+        self.search_sale_button.clicked.connect(self.search_sale)
+        self.search_sale_lineedit.textChanged.connect(self.search_sale)
+
+    def reload_sales_table(self, sales_data):
+        self.sales_table.clear()
+        self.sales_table.setColumnCount(8)
+        self.sales_table.setHorizontalHeaderLabels(["ID", "Date", "Total Amount ($)", "Cashier ID", 
+                                                    "Cashier Name", "Payment Method", "Status", "Date Edited"])
+        self.sales_table.setRowCount(len(sales_data)+28)
+        self.sales_table.setSortingEnabled(False)
+
+        # Populate table with sales data
+        for row_index, sale in enumerate(sales_data):
+            self.sales_table.setItem(row_index, 0, QTableWidgetItem(str(sale['id'])))
+            self.sales_table.setItem(row_index, 1, QTableWidgetItem(sale['date'].strftime('%Y-%m-%d')))
+            self.sales_table.setItem(row_index, 2, QTableWidgetItem(f"{sale['total_amount']:.2f}"))
+            self.sales_table.setItem(row_index, 3, QTableWidgetItem(str(sale['cashier_id'])))
+            self.sales_table.setItem(row_index, 4, QTableWidgetItem(sale['cashier_name']))
+            self.sales_table.setItem(row_index, 5, QTableWidgetItem(sale['payment_method']))
+            self.sales_table.setItem(row_index, 6, QTableWidgetItem(sale['status']))
+            self.sales_table.setItem(row_index, 7, QTableWidgetItem(sale['updated_at'].strftime('%Y-%m-%d')))
+
+
+        # Columns to make non-editable (e.g., ID)
+        non_editable_columns = {0, 1, 7}
+
+        # Populate the table with data
+        for row_index, sale in enumerate(self.sales):
+            for col_index, value in enumerate([
+            str(sale['id']),
+            sale['date'].strftime('%Y-%m-%d'),
+            f"{sale['total_amount']:.2f}",
+            str(sale['cashier_id']),
+            sale['cashier_name'],
+            sale['payment_method'],
+            sale['status'],
+            sale['updated_at'].strftime('%Y-%m-%d'),
+            ]):
+               item = QTableWidgetItem(value)
+
+            # Disable editing for specified columns
+            if col_index in non_editable_columns:
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+
+            self.sales_table.setItem(row_index, col_index, item)
+
+        # set column width to fit with table width
+        self.sales_table.horizontalHeader().setSectionResizeMode(1)
+        self.sales_table.setSelectionBehavior(QTableWidget.SelectRows)
+        self.sales_table.setSortingEnabled(True)
+
+    def reload_sales(self):
+        self.sales = self.db.fetch_all_sales()
+        self.reload_sales_table(self.sales)
+
+    def searching_reload_sales(self):
+        self.reload_sales_table(self.sales)
+
+    def update_sale(self):
+        selected_row = self.sales_table.currentRow()
+        if selected_row < 0:
+            self._show_error_message("No selected sale.")
+            return
+
+        sale_id = self.sales_table.item(selected_row, 0).text()
+        total_amount = self.sales_table.item(selected_row, 2).text()
+        cashier_id = self.sales_table.item(selected_row, 3).text()
+        cashier_name = self.sales_table.item(selected_row, 4).text()
+        payment_method = self.sales_table.item(selected_row, 5).text()
+
+        try:
+            self.db.update_sale(sale_id=sale_id, cashier_id=cashier_id, cashier_name=cashier_name, total_amount=total_amount, payment_method=payment_method)
+            self.reload_sales()
+            self._show_info_message(f"Sale ({sale_id}) has been updated successfully.")
+        except Exception as e:
+            self._show_error_message(f"Error updating sale: {str(e)}")
+
+    def import_sale(self):
+        try:
+            self.db.add_sales_from_dataset()
+            self.reload_sales()
+            self._show_info_message("Sales imported from Excel successfully.")
+        except Exception as e:
+            self._show_error_message(f"Error importing sales from Excel: {str(e)}")
+
+    def generate_pdf_report(self):
+        try: 
+            SaleReportGenerator(self.date_start, self.date_end)
+            self._show_info_message("PDF report generated successfully.")
+        except Exception as e:
+            self._show_error_message(f"Error generating PDF report: {str(e)}")
+
+    def delete_sale(self):
+        selected_row = self.sales_table.currentRow()
+        if selected_row < 0:
+            self._show_error_message("No selected sale.")
+            return
+
+        sale_id = self.sales_table.item(selected_row, 0).text()
+
+        try:
+            self.db.delete_sale(sale_id)
+            self.reload_sales()
+            self._show_info_message(f"Sale ({sale_id}) has been deleted successfully.")
+        except Exception as e:
+            self._show_error_message(f"Error deleting sale: {str(e)}")
+
+    def search_sale(self):
+        search_term = self.search_sale_lineedit.text().strip().lower()
+        try:
+            if search_term:
+                self.sales = self.db.search_sales_by_cashier_name(search_term)
+            else:
+                self.sales = self.db.fetch_all_sales()
+            self.reload_sales_table(self.sales)
+        except Exception as e:
+            self._show_error_message(f"Error searching sales: {str(e)}")
+
+
+
+
 
     # Product Management Functions
     def add_product(self):
@@ -235,7 +390,7 @@ class Admin(QMainWindow):
             self.products = self.db.fetch_all_products()
 
             # Define column headers
-            headers = ["ID", "Name", "Stock Quantity", "Price", "Category", 
+            headers = ["ID", "Name", "Stock Quantity", "Price ($)", "Category", 
                        "SKU", "Barcode", "Description", "Created At", "Updated At"]
 
             # Set the row and column count dynamically
@@ -245,6 +400,10 @@ class Admin(QMainWindow):
 
             # Set the selection behavior to highlight entire rows
             self.products_table.setSelectionBehavior(QTableWidget.SelectRows)
+            self.products_table.setSortingEnabled(True)
+
+            #Dynamically resize the table
+            self.products_table.horizontalHeader().setSectionResizeMode(1)
 
             # Populate the table with data
             for row_index, product in enumerate(self.products):

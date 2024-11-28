@@ -100,6 +100,7 @@ class Database:
             date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             total_amount DECIMAL(10, 2) NOT NULL CHECK(total_amount >= 0),
             cashier_id INT,
+            cashier_name TEXT,
             payment_method ENUM('Cash', 'Card', 'Digital Wallet') NOT NULL,
             status ENUM('Completed', 'Pending', 'Canceled') DEFAULT 'Completed',
             isDeleted BOOLEAN NOT NULL DEFAULT FALSE,
@@ -545,10 +546,8 @@ class Database:
     # Add sales from dataset (csv, excel)
     def add_sales_from_dataset(self):
         # Ask the user to select a dataset file
-        app = QApplication([])
         options = QFileDialog.Options()
         dataset, _ = QFileDialog.getOpenFileName(None, "Select Dataset", "", "CSV Files (*.csv);;Excel Files (*.xlsx)", options=options)
-        app.exit()
 
         # Check for file type
         if dataset.endswith(".csv"):
@@ -609,9 +608,20 @@ class Database:
         except Exception as e:
             print(f"--> Error fetching sale by ID: {e}")
             return None
-        
+    
+    # search sales by cashier name
+    def search_sales_by_cashier_name(self, cashier_name):
+        query = "SELECT * FROM sales WHERE cashier_name LIKE %s"
+        params = (f"%{cashier_name}%",)
+        try:
+            results = self.execute_query(query, params, fetchall=True)
+            return results
+        except Exception as e:
+            print(f"--> Error searching sales by cashier name: {e}")
+            return None
+
     # Update a sale
-    def update_sale(self, sale_id, total_amount=None, cashier_id=None, payment_method=None):
+    def update_sale(self, sale_id, total_amount=None, cashier_id=None, cashier_name=None, payment_method=None):
         query = "UPDATE sales SET "
         params = []
 
@@ -624,6 +634,9 @@ class Database:
         if payment_method:
             query += "payment_method=%s "
             params.append(payment_method)
+        if cashier_name:
+            query += "cashier_name=%s "
+            params.append(cashier_name)
 
         query = query.rstrip(", ") + " WHERE id=%s"
         params.append(sale_id)
@@ -632,6 +645,7 @@ class Database:
             print(f"--> Sale: ({sale_id}) has been updated successfully!")
         except Exception as e:
             print(f"--> Error updating sale: {e}")
+            raise Exception
 
     # Delete a sale
     def delete_sale(self, sale_id):
@@ -642,6 +656,7 @@ class Database:
             print(f"--> Sale: ({sale_id}) has been deleted successfully!")
         except Exception as e:
             print(f"--> Error deleting sale: {e}")
+            raise Exception
 
     # Clear all sales
     def clear_all_sales(self):

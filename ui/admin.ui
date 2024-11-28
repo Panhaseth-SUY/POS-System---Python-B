@@ -7,8 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>1536</width>
-    <height>830</height>
+    <height>960</height>
    </rect>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>1870</width>
+    <height>16777215</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
@@ -23,7 +29,7 @@ font: 12pt &quot;Arial&quot;;</string>
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>1805</width>
+      <width>1531</width>
       <height>972</height>
      </rect>
     </property>
@@ -603,7 +609,7 @@ QPushButton:checked{
            <rect>
             <x>20</x>
             <y>10</y>
-            <width>1191</width>
+            <width>1201</width>
             <height>73</height>
            </rect>
           </property>
@@ -752,7 +758,7 @@ QPushButton:checked{
          </property>
          <property name="maximumSize">
           <size>
-           <width>1800</width>
+           <width>1300</width>
            <height>831</height>
           </size>
          </property>
@@ -769,7 +775,7 @@ QPushButton:checked{
            </rect>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>4</number>
           </property>
           <widget class="QWidget" name="dashboard_page">
            <widget class="QLabel" name="label_3">
@@ -1218,7 +1224,7 @@ QTableWidget{
                 <bool>true</bool>
                </property>
                <attribute name="horizontalHeaderVisible">
-                <bool>true</bool>
+                <bool>false</bool>
                </attribute>
                <attribute name="horizontalHeaderCascadingSectionResizes">
                 <bool>true</bool>
@@ -1310,25 +1316,549 @@ QTableWidget{
            </widget>
           </widget>
           <widget class="QWidget" name="sales_page">
-           <widget class="QLabel" name="label_6">
+           <widget class="QWidget" name="layoutWidget_2">
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>0</y>
-              <width>67</width>
-              <height>31</height>
+              <y>10</y>
+              <width>1201</width>
+              <height>1641</height>
              </rect>
             </property>
-            <property name="font">
-             <font>
-              <pointsize>26</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Sales</string>
-            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_8">
+             <property name="spacing">
+              <number>20</number>
+             </property>
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout_9">
+               <item>
+                <widget class="QLabel" name="label_6">
+                 <property name="font">
+                  <font>
+                   <pointsize>26</pointsize>
+                   <weight>75</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Sales</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_12">
+                 <property name="text">
+                  <string>Welcome to the product page</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_11">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_12">
+                 <property name="spacing">
+                  <number>20</number>
+                 </property>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout">
+                   <property name="spacing">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <widget class="QDateEdit" name="date_start_dateEdit">
+                     <property name="font">
+                      <font>
+                       <pointsize>-1</pointsize>
+                      </font>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true">QDateEdit{
+	border: 1px solid gray;
+	background-color: black;
+	color: white;
+	font-size: 14px;
+	height: 35px;
+}
+
+QDateEdit:hover{
+	color: rgb(0, 144, 251);
+}
+
+</string>
+                     </property>
+                     <property name="wrapping">
+                      <bool>false</bool>
+                     </property>
+                     <property name="dateTime">
+                      <datetime>
+                       <hour>0</hour>
+                       <minute>0</minute>
+                       <second>0</second>
+                       <year>2010</year>
+                       <month>1</month>
+                       <day>1</day>
+                      </datetime>
+                     </property>
+                     <property name="minimumDate">
+                      <date>
+                       <year>2000</year>
+                       <month>1</month>
+                       <day>1</day>
+                      </date>
+                     </property>
+                     <property name="displayFormat">
+                      <string>dd-MM-yyyy</string>
+                     </property>
+                     <property name="calendarPopup">
+                      <bool>true</bool>
+                     </property>
+                     <property name="date">
+                      <date>
+                       <year>2010</year>
+                       <month>1</month>
+                       <day>1</day>
+                      </date>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QDateEdit" name="date_end_dateEdit">
+                     <property name="font">
+                      <font>
+                       <pointsize>-1</pointsize>
+                      </font>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true">QDateEdit{
+	border: 1px solid gray;
+	background-color: black;
+	color: white;
+	font-size: 14px;
+	height: 35px;
+}
+
+QDateEdit:hover{
+	color: rgb(0, 144, 251);
+}
+
+</string>
+                     </property>
+                     <property name="dateTime">
+                      <datetime>
+                       <hour>0</hour>
+                       <minute>0</minute>
+                       <second>0</second>
+                       <year>2025</year>
+                       <month>12</month>
+                       <day>30</day>
+                      </datetime>
+                     </property>
+                     <property name="minimumDate">
+                      <date>
+                       <year>2000</year>
+                       <month>1</month>
+                       <day>1</day>
+                      </date>
+                     </property>
+                     <property name="displayFormat">
+                      <string>dd-MM-yyyy</string>
+                     </property>
+                     <property name="calendarPopup">
+                      <bool>true</bool>
+                     </property>
+                     <property name="date">
+                      <date>
+                       <year>2025</year>
+                       <month>12</month>
+                       <day>30</day>
+                      </date>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="update_sale_pushButton">
+                   <property name="minimumSize">
+                    <size>
+                     <width>140</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton{
+	border: 1px solid gray;
+	border-radius: 5px;
+	background-color: black;
+	color: white;
+	font-size: 14px;
+	font-weight: bold;
+	height: 35px;
+}
+QPushButton:hover{
+	color: rgb(0, 144, 251);
+}
+
+QPushButton:checked{
+	background-color: rgb(0, 144, 251);
+	color: ligthgray;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>Update Sale</string>
+                   </property>
+                   <property name="checkable">
+                    <bool>true</bool>
+                   </property>
+                   <property name="autoExclusive">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="sale_import_excel_pushButton">
+                   <property name="minimumSize">
+                    <size>
+                     <width>130</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <pointsize>-1</pointsize>
+                     <weight>75</weight>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton{
+	border: 1px solid gray;
+	border-radius: 5px;
+	background-color: black;
+	color: white;
+	font-size: 14px;
+	font-weight: bold;
+	height: 35px;
+}
+QPushButton:hover{
+	color: rgb(0, 144, 251);
+}
+
+QPushButton:checked{
+	background-color: rgb(0, 144, 251);
+	color: ligthgray;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>Import Excel</string>
+                   </property>
+                   <property name="icon">
+                    <iconset>
+                     <normaloff>../assets/icon/excel.png</normaloff>../assets/icon/excel.png</iconset>
+                   </property>
+                   <property name="checkable">
+                    <bool>true</bool>
+                   </property>
+                   <property name="autoExclusive">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pdf_report_pushButton">
+                   <property name="minimumSize">
+                    <size>
+                     <width>130</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton{
+	border: 1px solid gray;
+	border-radius: 5px;
+	background-color: black;
+	color: white;
+	font-size: 14px;
+	font-weight: bold;
+	height: 35px;
+}
+
+QPushButton:hover{
+	color: rgb(0, 144, 251);
+}
+
+QPushButton:checked{
+	background-color: rgb(0, 144, 251);
+	color: ligthgray;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>PDF Report</string>
+                   </property>
+                   <property name="icon">
+                    <iconset>
+                     <normaloff>../assets/icon/pdf (1).png</normaloff>../assets/icon/pdf (1).png</iconset>
+                   </property>
+                   <property name="checkable">
+                    <bool>true</bool>
+                   </property>
+                   <property name="autoExclusive">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="delete_sale_pushButton">
+                   <property name="minimumSize">
+                    <size>
+                     <width>100</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton{
+	border: 1px solid gray;
+	border-radius: 5px;
+	background-color: black;
+	color: white;
+	font-size: 14px;
+	font-weight: bold;
+	height: 35px;
+}
+QPushButton:hover{
+	color: rgb(0, 144, 251);
+}
+
+QPushButton:checked{
+	background-color: rgb(0, 144, 251);
+	color: ligthgray;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>Delete</string>
+                   </property>
+                   <property name="checkable">
+                    <bool>true</bool>
+                   </property>
+                   <property name="autoExclusive">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="reload_pushButton_2">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton{
+	border: none;
+}
+
+</string>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="icon">
+                    <iconset>
+                     <normaloff>../assets/icon/refresh.png</normaloff>../assets/icon/refresh.png</iconset>
+                   </property>
+                   <property name="iconSize">
+                    <size>
+                     <width>35</width>
+                     <height>35</height>
+                    </size>
+                   </property>
+                   <property name="checkable">
+                    <bool>true</bool>
+                   </property>
+                   <property name="autoExclusive">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_4">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_13">
+                 <property name="rightMargin">
+                  <number>10</number>
+                 </property>
+                 <item>
+                  <widget class="QLineEdit" name="search_sale_lineEdit">
+                   <property name="minimumSize">
+                    <size>
+                     <width>200</width>
+                     <height>38</height>
+                    </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QLineEdit{
+	padding-left: 20px;
+	border: 1px solid gray;
+	border-radius: 10px;
+}</string>
+                   </property>
+                   <property name="placeholderText">
+                    <string>Search here ...</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="search_sale_pushButton">
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton{
+	border: none;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="icon">
+                    <iconset>
+                     <normaloff>../assets/icon/search_10023926.png</normaloff>../assets/icon/search_10023926.png</iconset>
+                   </property>
+                   <property name="iconSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                   <property name="checkable">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QTableWidget" name="sales_table">
+               <property name="minimumSize">
+                <size>
+                 <width>1190</width>
+                 <height>800</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QHeaderView::section{
+	font-weight: bold;
+	background-color: black;
+	color: white;
+	height: 40px;
+	font-size: 14px;
+}
+
+QTableWidget{
+	alternate-background-color: #B0EDFD;
+	background-color:#F4F9FA;
+	color:black;
+}
+
+</string>
+               </property>
+               <property name="verticalScrollBarPolicy">
+                <enum>Qt::ScrollBarAlwaysOn</enum>
+               </property>
+               <property name="horizontalScrollBarPolicy">
+                <enum>Qt::ScrollBarAlwaysOn</enum>
+               </property>
+               <property name="alternatingRowColors">
+                <bool>true</bool>
+               </property>
+               <property name="showGrid">
+                <bool>true</bool>
+               </property>
+               <property name="gridStyle">
+                <enum>Qt::DashLine</enum>
+               </property>
+               <property name="sortingEnabled">
+                <bool>true</bool>
+               </property>
+               <property name="wordWrap">
+                <bool>true</bool>
+               </property>
+               <attribute name="horizontalHeaderVisible">
+                <bool>true</bool>
+               </attribute>
+               <attribute name="horizontalHeaderCascadingSectionResizes">
+                <bool>true</bool>
+               </attribute>
+               <attribute name="horizontalHeaderDefaultSectionSize">
+                <number>150</number>
+               </attribute>
+               <attribute name="horizontalHeaderHighlightSections">
+                <bool>true</bool>
+               </attribute>
+               <attribute name="horizontalHeaderStretchLastSection">
+                <bool>false</bool>
+               </attribute>
+               <attribute name="verticalHeaderVisible">
+                <bool>false</bool>
+               </attribute>
+               <column>
+                <property name="text">
+                 <string>ID</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Date</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Total Amount</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Cashier ID</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Cashier Name</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Payment Method</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Status</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Date Edited</string>
+                </property>
+               </column>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </widget>
           <widget class="QWidget" name="user_page">
