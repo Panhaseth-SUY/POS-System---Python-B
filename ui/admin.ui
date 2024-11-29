@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1536</width>
-    <height>960</height>
+    <height>827</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -775,7 +775,7 @@ QPushButton:checked{
            </rect>
           </property>
           <property name="currentIndex">
-           <number>4</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="dashboard_page">
            <widget class="QLabel" name="label_3">
@@ -1799,7 +1799,7 @@ QTableWidget{
                 <bool>true</bool>
                </property>
                <attribute name="horizontalHeaderVisible">
-                <bool>true</bool>
+                <bool>false</bool>
                </attribute>
                <attribute name="horizontalHeaderCascadingSectionResizes">
                 <bool>true</bool>

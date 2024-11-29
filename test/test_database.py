@@ -76,42 +76,12 @@ if __name__ == '__main__':
     # db.delete_category(1)
 
 
-### Test products table
+#! Test products table =================================================================
     # Insert some products by default into the database
     # # (name, sku, barcode, description, price, stock_quantity, category_id)
     # db.add_product("Lays", "Lays-001", "Lays-001", "Lays Chips", 0.75, 100, 1)
     # db.add_product("Coca-Cola", "Coca-Cola-001", "Coca-Cola-001", "Coca-Cola Can", 1.00, 100, 9)
-    # db.add_product("Sprite", "Sprite-001", "Sprite-001", "Sprite Can", 1.00, 100, 9)
-    # db.add_product("Fanta", "Fanta-001", "Fanta-001", "Fanta Can", 1.00, 100, 9)
-    # db.add_product("Pepsi", "Pepsi-001", "Pepsi-001", "Pepsi Can", 1.00, 100, 9)
-    # db.add_product("Chicken Wings", "Chicken-Wings-001", "Chicken-Wings-001", "Chicken Wings", 5.00, 100, 4)
-    # db.add_product("Chicken Nuggets", "Chicken-Nuggets-001", "Chicken-Nuggets-001", "Chicken Nuggets", 3.00, 100, 4)
-    # db.add_product("Beef", "Beef-001", "Beef-001", "Beef", 10.00, 100, 4)
-    # db.add_product("Pork", "Pork-001", "Pork-001", "Pork", 8.00, 100, 4)
-    # db.add_product("Fish", "Fish-001", "Fish-001", "Fish", 6.00, 100, 5)
-    # db.add_product("Salmon", "Salmon-001", "Salmon-001", "Salmon", 12.00, 100, 5)
-    # db.add_product("Tuna", "Tuna-001", "Tuna-001", "Tuna", 10.00, 100, 5)
-    # db.add_product("Apple", "Apple-001", "Apple-001", "Apple", 1.00, 100, 2)
-    # db.add_product("Banana", "Banana-001", "Banana-001", "Banana", 0.50, 100, 2)
-    # db.add_product("Orange", "Orange-001", "Orange-001", "Orange", 0.75, 100, 2)
-    # db.add_product("Peach", "Peach-001", "Peach-001", "Peach", 1.00, 100, 2)
-    # db.add_product("Carrot", "Carrot-001", "Carrot-001", "Carrot", 0.25, 100, 3)
-    # db.add_product("Cucumber", "Cucumber-001", "Cucumber-001", "Cucumber", 0.50, 100, 3)
-    # db.add_product("Tomato", "Tomato-001", "Tomato-001", "Tomato", 0.75, 100, 3)
-    # db.add_product("Potato", "Potato-001", "Potato-001", "Potato", 0.50, 100, 3)
-    # db.add_product("Bread", "Bread-001", "Bread-001", "Bread", 1.00, 100, 6)
-    # db.add_product("Croissant", "Croissant-001", "Croissant-001", "Croissant", 1.50, 100, 6)
-    # db.add_product("Donut", "Donut-001", "Donut-001", "Donut", 0.75, 100, 6)
-    # db.add_product("Candy", "Candy-001", "Candy-001", "Candy", 0.25, 100, 7)
-    # db.add_product("Chocolate", "Chocolate-001", "Chocolate-001", "Chocolate", 1.00, 100, 7)
-    # db.add_product("Ice Cream", "Ice-Cream-001", "Ice-Cream-001", "Ice Cream", 2.00, 100, 8)
-    # db.add_product("Vanilla", "Vanilla-001", "Vanilla-001", "Vanilla", 2.00, 100, 8)
-    # db.add_product("Strawberry", "Strawberry-001", "Strawberry-001", "Strawberry", 2.00, 100, 8)
-    # db.add_product("Red Wine", "Red-Wine-001", "Red-Wine-001", "Red Wine", 10.00, 100, 10)
-    # db.add_product("White Wine", "White-Wine-001", "White-Wine-001", "White Wine", 10.00, 100, 10)
-    # db.add_product("Rose Wine", "Rose-Wine-001", "Rose-Wine-001", "Rose Wine", 10.00, 100, 10)
-    # db.add_product("Beer", "Beer-001", "Beer-001", "Beer", 2.00, 100, 11)
-    # db.add_product("Whiskey", "Whiskey-001", "Whiskey-001", "Whiskey", 5.00, 100, 12)
+    # db.add_product("Sprite", "Sprite-001", "Sprite-001", "Spri
 
     # Add products from datasets
     # db.add_products_from_dataset()
@@ -135,7 +105,7 @@ if __name__ == '__main__':
     # db.clear_all_products()
 
 
-### Test sales table
+#! Test sales table =================================================================
     # Insert some sales by default into the database
     # (total_amount, cashier_id, payment_method)
     # db.add_sale(10.00, 3, "Cash")

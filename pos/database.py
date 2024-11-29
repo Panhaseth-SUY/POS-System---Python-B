@@ -66,7 +66,7 @@ class Database:
             username VARCHAR(50) NOT NULL UNIQUE,
             password VARCHAR(255) NOT NULL, 
             role ENUM('Admin', 'Cashier', 'Manager') NOT NULL DEFAULT 'Cashier',
-            status ENUM('Active', 'Inactive') NOT NULL DEFAULT 'Active', -- User account status
+            status ENUM('Active', 'Inactive') NOT NULL DEFAULT 'Active', 
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )""",
@@ -100,7 +100,7 @@ class Database:
             date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             total_amount DECIMAL(10, 2) NOT NULL CHECK(total_amount >= 0),
             cashier_id INT,
-            cashier_name TEXT,
+            cashier_name VARCHAR(50),
             payment_method ENUM('Cash', 'Card', 'Digital Wallet') NOT NULL,
             status ENUM('Completed', 'Pending', 'Canceled') DEFAULT 'Completed',
             isDeleted BOOLEAN NOT NULL DEFAULT FALSE,
@@ -115,7 +115,7 @@ class Database:
             product_id INT,
             quantity INT NOT NULL,
             unit_price DECIMAL(10, 2) NOT NULL CHECK (unit_price >= 0),
-            subtotal DECIMAL(10, 2) NOT NULL CHECK (subtotal >= 0), -- quantity * unit_price
+            subtotal DECIMAL(10, 2) NOT NULL CHECK (subtotal >= 0), 
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (sale_id) REFERENCES sales(id) ON DELETE CASCADE,
@@ -128,6 +128,10 @@ class Database:
             print("--> All Tables are initialized successfully!")
         except Exception as e:
             print(f"--> Error initializing tables: {e}")
+
+
+
+
 
     ### Add a user -----------------------------------------------------
     def add_user(self, name, username, password, role):
@@ -226,6 +230,11 @@ class Database:
     # Hash a password
     def hash_password(self, password):
         return hashlib.sha256(password.encode()).hexdigest()
+
+
+
+
+
 
     ### Add a product ----------------------------------------------------------------
     def add_product(self, name, sku, barcode, description, price, stock_quantity, category_id):
@@ -394,7 +403,7 @@ class Database:
             print(f"--> Error soft deleting product: {e}")
 
     # Clear all products
-    def clear_products(self):
+    def soft_clear_products(self):
         query = "UPDATE products SET isDeleted=True"
         try:
             self.execute_query(query)
@@ -403,6 +412,15 @@ class Database:
             print(f"--> Error soft deleting all products: {e}")
             raise Exception
 
+    # Clear all products
+    def clear_all_products(self):
+        query = "DELETE FROM products"
+        try:
+            self.execute_query(query)
+            print("--> All products have been cleared successfully!")
+        except Exception as e:
+            print(f"--> Error clearing products: {e}")
+            
     # Check if a product if it is referenced in the sales_items table
     def is_product_referenced(self, product_id):
         query = "SELECT COUNT(*) as count FROM sales_items WHERE product_id = %s"
@@ -413,6 +431,7 @@ class Database:
         except Exception as e:
             print(f"--> Error checking if product is referenced: {e}")
             return False
+
 
     ### Add a category --------------------------------------------------------------
     def add_category(self, name, description=None):
@@ -529,6 +548,10 @@ class Database:
             print("--> All categories have been cleared successfully!")
         except Exception as e:
             print(f"--> Error clearing categories: {e}")
+
+
+
+
 
     ### Add a sale --------------------------------------------------------------
     def add_sale(self, total_amount, cashier_id, payment_method, date=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')):
@@ -666,6 +689,11 @@ class Database:
             print("--> All sales have been cleared successfully!")
         except Exception as e:
             print(f"--> Error clearing sales: {e}")
+
+
+
+
+
 
     ### Add a sale item --------------------------------------------------------------
     def add_sale_item(self, sale_id, product_id, quantity, unit_price, subtotal):
