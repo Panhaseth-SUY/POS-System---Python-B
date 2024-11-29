@@ -305,8 +305,8 @@ class Admin(QMainWindow):
         self.sale_pdf_report_button.clicked.connect(self.generate_pdf_report)
         self.delete_sale_button.clicked.connect(self.delete_sale)
         self.reload_sale_button.clicked.connect(self.reload_all_sales)
-        self.search_sale_button.clicked.connect(self.reload_sales_table)
-        self.search_sale_lineedit.textChanged.connect(self.reload_sales_table)
+        self.search_sale_button.clicked.connect(self.search_sales)
+        self.search_sale_lineedit.textChanged.connect(self.search_sales)
 
         # Populate the sales table
         self.reload_all_sales()
@@ -384,47 +384,61 @@ class Admin(QMainWindow):
         # Populate table with sales data
         for row_index, sale in enumerate(sales_data):
             self.sales_table.setItem(row_index, 0, QTableWidgetItem(str(sale['id'])))
-            self.sales_table.setItem(row_index, 1, QTableWidgetItem(sale['date'].strftime('%Y-%m-%d')))
+            self.sales_table.setItem(row_index, 1, QTableWidgetItem(sale['date'].strftime('%Y-%m-%d %H:%M:%S')))
             self.sales_table.setItem(row_index, 2, QTableWidgetItem(f"{sale['total_amount']:.2f}"))
             self.sales_table.setItem(row_index, 3, QTableWidgetItem(str(sale['cashier_id'])))
             self.sales_table.setItem(row_index, 4, QTableWidgetItem(sale['cashier_name']))
             self.sales_table.setItem(row_index, 5, QTableWidgetItem(sale['payment_method']))
             self.sales_table.setItem(row_index, 6, QTableWidgetItem(sale['status']))
-            self.sales_table.setItem(row_index, 7, QTableWidgetItem(sale['updated_at'].strftime('%Y-%m-%d')))
+            self.sales_table.setItem(row_index, 7, QTableWidgetItem(sale['updated_at'].strftime('%Y-%m-%d %H:%M:%S')))
 
 
-        # Columns to make non-editable (e.g., ID)
+        # Columns to make non-editable (e.g., ID, Updated At)
         non_editable_columns = {0, 1, 7}
 
         # Populate the table with data
         for row_index, sale in enumerate(self.sales):
             for col_index, value in enumerate([
-            str(sale['id']),
-            sale['date'].strftime('%Y-%m-%d'),
-            f"{sale['total_amount']:.2f}",
-            str(sale['cashier_id']),
-            sale['cashier_name'],
-            sale['payment_method'],
-            sale['status'],
-            sale['updated_at'].strftime('%Y-%m-%d'),
+                str(sale['id']),  # Sale ID
+                sale['date'].strftime('%Y-%m-%d %H:%M:%S'),  # Date
+                f"{sale['total_amount']:.2f}",  # Total Amount
+                str(sale['cashier_id']),  # Cashier ID
+                sale['cashier_name'],  # Cashier Name
+                sale['payment_method'],  # Payment Method
+                sale['status'],  # Status
+                sale['updated_at'].strftime('%Y-%m-%d %H:%M:%S'),  # Updated At
             ]):
-               item = QTableWidgetItem(value)
+                # Create a QTableWidgetItem for each value
+                item = QTableWidgetItem(value)
 
-            # Disable editing for specified columns
-            if col_index in non_editable_columns:
-                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                # Disable editing for specified columns
+                if col_index in non_editable_columns:
+                    item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)  # Non-editable
 
-            self.sales_table.setItem(row_index, col_index, item)
+                # Set the item in the sales table
+                self.sales_table.setItem(row_index, col_index, item)
 
-        # set column width to fit with table width
-        self.sales_table.horizontalHeader().setSectionResizeMode(1)
-        self.sales_table.setSelectionBehavior(QTableWidget.SelectRows)
-        self.sales_table.setSortingEnabled(True)
+
+                # set column width to fit with table width
+                self.sales_table.horizontalHeader().setSectionResizeMode(1)
+                self.sales_table.setSelectionBehavior(QTableWidget.SelectRows)
+                self.sales_table.setSortingEnabled(True)
 
     def reload_all_sales(self):
         self.sales = self.db.fetch_all_sales()
         self.reload_sales_table() 
 
+    def search_sales(self):
+        search_term = self.search_sale_lineedit.text().strip().lower()
+        try:
+            if search_term:
+                self.sales = self.db.search_sales_by_cashier_name(search_term)
+            else:
+                self.sales = self.db.fetch_all_sales()
+            self.reload_sales_table()
+        except Exception as e:
+            print(f"Error searching sales: {e}")
+            self._show_error_message("Failed to search sales.")
 
 
 
