@@ -8,11 +8,11 @@ import sys
 
 
 class AddProductDialog(QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, Database=Database()):
         super(AddProductDialog, self).__init__(parent)
 
         # Initialize the database connection
-        self.db = Database()  
+        self.db = Database
 
         # Load the UI file
         uic.loadUi('ui/add_new_product_dialog.ui', self)
@@ -88,12 +88,13 @@ class AddProductDialog(QDialog):
         try:
             # Insert product into the database
             self.db.add_product(name, sku, barcode, description, price, quantity, category_id)
-
+            # db.add_product("Lays", "Lays-001", "Lays-001", "Lays Chips", 0.75, 100, 1)
             # Show success message
             self._show_info_message("Product added successfully.")
             self.close()
         except Exception as e:
             self._show_error_message(f"Failed to add product: {str(e)}")
+            raise Exception(f"Failed to add product: {str(e)}")
 
     def _show_error_message(self, message):
         """Display an error message to the user."""

@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (
     QMainWindow, QApplication, QPushButton, QStackedWidget, QLabel, QTableWidget, QTableWidgetItem, QLineEdit,
-    QMessageBox
+    QMessageBox, QDialog
 )
 from PyQt5.QtCore import Qt
 from PyQt5 import uic
@@ -9,6 +9,8 @@ from database import Database
 from sale_report_generator import SaleReportGenerator
 from add_product_dialog import AddProductDialog
 from datetime import datetime
+import time
+from threading import Thread
 
 class Admin(QMainWindow):
     def __init__(self):
@@ -53,6 +55,7 @@ class Admin(QMainWindow):
         self.users_button = self.findChild(QPushButton, 'users_button')
         self.setting_button = self.findChild(QPushButton, 'setting_button')
         self.signout_button = self.findChild(QPushButton, 'signout_button')
+        self.process_status_label = self.findChild(QLabel, 'process_status_Label')
 
         # User information
         self.user_name = self.findChild(QLabel, 'user_name')
@@ -100,7 +103,7 @@ class Admin(QMainWindow):
         self.export_excel_button = self.findChild(QPushButton, 'export_excel_pushButton')
         self.import_excel_button = self.findChild(QPushButton, 'import_excel_pushButton')
         self.delete_product_button = self.findChild(QPushButton, 'delete_pushButton')
-        self.reload_button = self.findChild(QPushButton, 'reload_pushButton')
+        self.reload_products_button = self.findChild(QPushButton, 'reload_pushButton')
         self.search_product_lineedit = self.findChild(QLineEdit, 'search_product_lineEdit')
         self.search_product_button = self.findChild(QPushButton, 'search_product_pushButton')
 
@@ -111,7 +114,7 @@ class Admin(QMainWindow):
         self.export_excel_button.clicked.connect(self.export_excel)
         self.import_excel_button.clicked.connect(self.import_excel)
         self.delete_product_button.clicked.connect(self.delete_product)
-        self.reload_button.clicked.connect(self.reload_all_products)
+        self.reload_products_button.clicked.connect(self.reload_all_products)
         self.search_product_button.clicked.connect(self.search_product)
         self.search_product_lineedit.textChanged.connect(self.search_product)
 
@@ -119,9 +122,15 @@ class Admin(QMainWindow):
         self.reload_all_products()
 
     def add_product(self):
-        dialog = AddProductDialog(self)
-        dialog.exec_()
-        self.reload_all_products()  
+        try:
+            # Open the Add Product dialog
+            dialog = AddProductDialog(Database=self.db)
+            dialog.exec_()
+            self.products = self.db.fetch_all_products()
+            self.reload_all_products()
+        except Exception as e:
+            print(f"Error adding product: {e}")
+            self._show_error_message(f"Error adding product: {e}")
 
     def update_product(self):
         # edit the selected product
@@ -188,14 +197,12 @@ class Admin(QMainWindow):
             self._show_error_message("Failed to delete product.")
 
     def reload_products_table(self):
+        self.process_status_label.setText("Reloading products table...")
         # clear all products from table
-        self.products_table.clear()
+        self.products_table.clearContents()
         self.products_table.setRowCount(0)
 
         try:
-            # Fetch all products from the database
-            self.products = self.db.fetch_all_products()
-
             # Define column headers
             headers = ["ID", "Name", "Stock Quantity", "Price ($)", "Category", 
                        "SKU", "Barcode", "Description", "Created At", "Updated At"]
@@ -207,7 +214,6 @@ class Admin(QMainWindow):
 
             # Set the selection behavior to highlight entire rows
             self.products_table.setSelectionBehavior(QTableWidget.SelectRows)
-            self.products_table.setSortingEnabled(True)
 
             #Dynamically resize the table
             self.products_table.horizontalHeader().setSectionResizeMode(1)
@@ -251,10 +257,13 @@ class Admin(QMainWindow):
 
                     self.products_table.setItem(row_index, col_index, item)
 
-            self.products_table.setSortingEnabled(True)
         except Exception as e:
             print(f"Error loading products: {e}")
             self._show_error_message("Failed to load products.")
+        finally:
+            self.process_status_label.setText("Products table reloaded.")
+            time.sleep(1)
+            self.process_status_label.setText("")
 
     def reload_all_products(self):
         self.products = self.db.fetch_all_products()

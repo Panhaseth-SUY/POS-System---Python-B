@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1536</width>
-    <height>827</height>
+    <height>960</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -581,6 +581,16 @@ QPushButton:checked{
            </item>
           </layout>
          </item>
+         <item>
+          <widget class="QLabel" name="process_status_Label">
+           <property name="styleSheet">
+            <string notr="true">color: blue</string>
+           </property>
+           <property name="text">
+            <string>Process Status ...</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </widget>
@@ -778,47 +788,73 @@ QPushButton:checked{
            <number>2</number>
           </property>
           <widget class="QWidget" name="dashboard_page">
-           <widget class="QLabel" name="label_3">
+           <widget class="QWidget" name="layoutWidget">
             <property name="geometry">
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>134</width>
-              <height>31</height>
+              <width>183</width>
+              <height>67</height>
              </rect>
             </property>
-            <property name="font">
-             <font>
-              <pointsize>26</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Dashboard</string>
-            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_11">
+             <item>
+              <widget class="QLabel" name="label_3">
+               <property name="font">
+                <font>
+                 <pointsize>26</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Dashboard</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_14">
+               <property name="text">
+                <string>Welcome to the product page</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </widget>
           <widget class="QWidget" name="categories_page">
-           <widget class="QLabel" name="label_13">
+           <widget class="QWidget" name="layoutWidget">
             <property name="geometry">
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>134</width>
-              <height>31</height>
+              <width>183</width>
+              <height>67</height>
              </rect>
             </property>
-            <property name="font">
-             <font>
-              <pointsize>26</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Categories</string>
-            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_10">
+             <item>
+              <widget class="QLabel" name="label_13">
+               <property name="font">
+                <font>
+                 <pointsize>26</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Categories</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_11">
+               <property name="text">
+                <string>Welcome to the product page</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </widget>
           <widget class="QWidget" name="product_page">
@@ -1224,7 +1260,7 @@ QTableWidget{
                 <bool>true</bool>
                </property>
                <attribute name="horizontalHeaderVisible">
-                <bool>false</bool>
+                <bool>true</bool>
                </attribute>
                <attribute name="horizontalHeaderCascadingSectionResizes">
                 <bool>true</bool>
@@ -1294,25 +1330,38 @@ QTableWidget{
            </widget>
           </widget>
           <widget class="QWidget" name="pos_page">
-           <widget class="QLabel" name="label_5">
+           <widget class="QWidget" name="layoutWidget">
             <property name="geometry">
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>170</width>
-              <height>31</height>
+              <width>183</width>
+              <height>67</height>
              </rect>
             </property>
-            <property name="font">
-             <font>
-              <pointsize>26</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Point Of Sales</string>
-            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_12">
+             <item>
+              <widget class="QLabel" name="label_5">
+               <property name="font">
+                <font>
+                 <pointsize>26</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Point Of Sales</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_15">
+               <property name="text">
+                <string>Welcome to the product page</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </widget>
           <widget class="QWidget" name="sales_page">
@@ -1862,69 +1911,108 @@ QTableWidget{
            </widget>
           </widget>
           <widget class="QWidget" name="user_page">
-           <widget class="QLabel" name="label_7">
+           <widget class="QWidget" name="layoutWidget">
             <property name="geometry">
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>71</width>
-              <height>31</height>
+              <width>183</width>
+              <height>67</height>
              </rect>
             </property>
-            <property name="font">
-             <font>
-              <pointsize>26</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Users</string>
-            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_13">
+             <item>
+              <widget class="QLabel" name="label_7">
+               <property name="font">
+                <font>
+                 <pointsize>26</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Users</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_16">
+               <property name="text">
+                <string>Welcome to the product page</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </widget>
           <widget class="QWidget" name="setting_page">
-           <widget class="QLabel" name="label_8">
+           <widget class="QWidget" name="layoutWidget">
             <property name="geometry">
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>89</width>
-              <height>31</height>
+              <width>183</width>
+              <height>67</height>
              </rect>
             </property>
-            <property name="font">
-             <font>
-              <pointsize>26</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Setting</string>
-            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_14">
+             <item>
+              <widget class="QLabel" name="label_8">
+               <property name="font">
+                <font>
+                 <pointsize>26</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Setting</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_17">
+               <property name="text">
+                <string>Welcome to the product page</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </widget>
           <widget class="QWidget" name="info_page_2">
-           <widget class="QLabel" name="label_9">
+           <widget class="QWidget" name="layoutWidget">
             <property name="geometry">
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>145</width>
-              <height>31</height>
+              <width>183</width>
+              <height>67</height>
              </rect>
             </property>
-            <property name="font">
-             <font>
-              <pointsize>26</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>System Info</string>
-            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_15">
+             <item>
+              <widget class="QLabel" name="label_9">
+               <property name="font">
+                <font>
+                 <pointsize>26</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>System Info</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_18">
+               <property name="text">
+                <string>Welcome to the product page</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </widget>
           <widget class="QWidget" name="blank_page"/>
