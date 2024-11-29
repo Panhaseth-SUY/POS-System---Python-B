@@ -202,6 +202,9 @@ class Admin(QMainWindow):
         self.products_table.clearContents()
         self.products_table.setRowCount(0)
 
+        # Set horizontal header visibility
+        self.products_table.horizontalHeader().setVisible(True)
+
         try:
             # Define column headers
             headers = ["ID", "Name", "Stock Quantity", "Price ($)", "Category", 
@@ -262,8 +265,6 @@ class Admin(QMainWindow):
             self._show_error_message("Failed to load products.")
         finally:
             self.process_status_label.setText("Products table reloaded.")
-            time.sleep(1)
-            self.process_status_label.setText("")
 
     def reload_all_products(self):
         self.products = self.db.fetch_all_products()
@@ -322,9 +323,9 @@ class Admin(QMainWindow):
         cashier_name = self.sales_table.item(selected_row, 4).text()
         payment_method = self.sales_table.item(selected_row, 5).text()
 
-        if not total_amount or not cashier_id or not cashier_name or not payment_method:
-            self._show_error_message("Please fill in all required fields.")
-            return
+        if not cashier_name:
+            cashier_name = self.db.fetch_user_by_id(cashier_id)
+            cashier_name = cashier_name['name']
 
         try:
             self.db.update_sale(sale_id=sale_id, cashier_id=cashier_id, cashier_name=cashier_name, total_amount=total_amount, payment_method=payment_method)
@@ -364,7 +365,14 @@ class Admin(QMainWindow):
             self._show_error_message(f"Error deleting sale: {str(e)}")
 
     def reload_sales_table(self):
-        self.sales_table.clear()
+        self.process_status_label.setText("Reloading sales table...")
+        self.sales_table.clearContents()
+        self.sales_table.setRowCount(0)
+        
+        # set horizontal header visibility
+        self.sales_table.horizontalHeader().setVisible(True)
+
+        # Set the column headers
         self.sales_table.setColumnCount(8)
         self.sales_table.setHorizontalHeaderLabels(["ID", "Date", "Total Amount ($)", "Cashier ID", 
                                                     "Cashier Name", "Payment Method", "Status", "Date Edited"])

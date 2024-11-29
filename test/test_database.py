@@ -108,7 +108,7 @@ if __name__ == '__main__':
 #! Test sales table =================================================================
     # Insert some sales by default into the database
     # (total_amount, cashier_id, payment_method)
-    # db.add_sale(10.00, 3, "Cash")
+    # db.add_sale(10.00, 3, "Daro HEn", "Cash")
     # db.add_sale(12.00, 3, "Card")
     # db.add_sale(40.00, 4, "Digital Wallet")
     # db.add_sale(45.00, 7, "Cash")
@@ -129,7 +129,7 @@ if __name__ == '__main__':
     # pprint(db.get_last_sale_id())
 
     # update a sale
-    # db.update_sale(9, total_amount=12.00)
+    # db.update_sale(sale_id=101, total_amount=100.00, cashier_id=4, cashier_name="Panhaseth SUY", payment_method="Cash")
 
     # delete a sale
     # db.delete_sale(9)

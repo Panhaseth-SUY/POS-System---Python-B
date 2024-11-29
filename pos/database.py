@@ -83,6 +83,7 @@ class Database:
             """CREATE TABLE IF NOT EXISTS products (
             id INT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(100) NOT NULL,
+            category_id INT NOT NULL,
             sku VARCHAR(50) NOT NULL UNIQUE,
             barcode VARCHAR(50) NOT NULL UNIQUE,
             description TEXT,
@@ -99,7 +100,7 @@ class Database:
             date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             total_amount DECIMAL(10, 2) NOT NULL CHECK(total_amount >= 0),
             cashier_id INT NOT NULL,
-            cashier_name VARCHAR(50),
+            cashier_name VARCHAR(255),
             payment_method ENUM('Cash', 'Card', 'Digital Wallet') NOT NULL,
             status ENUM('Completed', 'Pending', 'Canceled') DEFAULT 'Completed',
             isDeleted BOOLEAN NOT NULL DEFAULT FALSE,
@@ -132,7 +133,7 @@ class Database:
 
 
 
-    ### Add a user -----------------------------------------------------
+    #! Add a user -----------------------------------------------------
     def add_user(self, name, username, password, role):
         hash_password = self.hash_password(password)
         query = "INSERT INTO users(name, username, password, role) VALUES(%s, %s, %s, %s)"
@@ -151,6 +152,17 @@ class Database:
             return results
         except Exception as e:
             print(f"--> Error fetching users: {e}")
+            return None
+
+    # fetch a user by id
+    def fetch_user_by_id(self, user_id):
+        query = "SELECT * FROM users WHERE id=%s"
+        params = (user_id,)
+        try:
+            result = self.execute_query(query, params, fetchone=True)
+            return result
+        except Exception as e:
+            print(f"--> Error fetching user by ID: {e}")
             return None
 
     # Fetch a user by username
@@ -235,7 +247,7 @@ class Database:
 
 
 
-    ### Add a product ----------------------------------------------------------------
+    #! Add a product ----------------------------------------------------------------
     def add_product(self, name, sku, barcode, description, price, stock_quantity, category_id):
         query = "INSERT INTO products(name, sku, barcode, description, price, stock_quantity, category_id) VALUES(%s, %s, %s, %s, %s, %s, %s)"
         params = (name, sku, barcode, description, price, stock_quantity, category_id)
@@ -432,7 +444,7 @@ class Database:
             return False
 
 
-    ### Add a category --------------------------------------------------------------
+    #! Add a category --------------------------------------------------------------
     def add_category(self, name, description=None):
         query = "INSERT INTO categories(name, description) VALUES(%s, %s)"
         params = (name, description)
@@ -552,10 +564,10 @@ class Database:
 
 
 
-    ### Add a sale --------------------------------------------------------------
-    def add_sale(self, total_amount, cashier_id, payment_method, date=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')):
-        query = "INSERT INTO sales(date, total_amount, cashier_id, payment_method) VALUES(%s, %s, %s, %s)"
-        params = (date, total_amount, cashier_id, payment_method)
+    #! Add a sale --------------------------------------------------------------
+    def add_sale(self, total_amount, cashier_id, cashier_name, payment_method, date=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')):
+        query = "INSERT INTO sales(date, total_amount, cashier_id, cashier_name, payment_method) VALUES(%s, %s, %s, %s, %s)"
+        params = (date, total_amount, cashier_id, cashier_name, payment_method)
         try:
             self.execute_query(query, params)
             # get last sale id from the database
@@ -654,7 +666,7 @@ class Database:
             query += "cashier_id=%s, "
             params.append(cashier_id)
         if payment_method:
-            query += "payment_method=%s "
+            query += "payment_method=%s, "
             params.append(payment_method)
         if cashier_name:
             query += "cashier_name=%s "
@@ -667,7 +679,7 @@ class Database:
             print(f"--> Sale: ({sale_id}) has been updated successfully!")
         except Exception as e:
             print(f"--> Error updating sale: {e}")
-            raise Exception
+            raise Exception(f"Error updating sale{sale_id}: {e}")
 
     # Delete a sale
     def delete_sale(self, sale_id):
@@ -694,7 +706,7 @@ class Database:
 
 
 
-    ### Add a sale item --------------------------------------------------------------
+    #! Add a sale item --------------------------------------------------------------
     def add_sale_item(self, sale_id, product_id, quantity, unit_price, subtotal):
         query = "INSERT INTO sales_items(sale_id, product_id, quantity, unit_price, subtotal) VALUES(%s, %s, %s, %s, %s)"
         params = (sale_id, product_id, quantity, unit_price, subtotal)
