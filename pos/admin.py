@@ -344,7 +344,7 @@ class Admin(QMainWindow):
 
     def generate_pdf_report(self):
         try: 
-            SaleReportGenerator(date_start="2015-01-01", date_end="2023-12-31")
+            SaleReportGenerator(date_start="2015-01-01", date_end="2023-12-31", Database=self.db)
             self._show_info_message("PDF report generated successfully.")
         except Exception as e:
             self._show_error_message(f"Error generating PDF report: {str(e)}")

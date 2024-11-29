@@ -16,8 +16,8 @@ from collections import defaultdict
 
 
 class SaleReportGenerator:
-    def __init__(self, all_sale=False, date_start=None, date_end=None):
-        self.db = Database()
+    def __init__(self, all_sale=False, date_start=None, date_end=None, Database=Database()):
+        self.db = Database
         self.generate(all_sale, date_start, date_end)
 
     # Generate sales report as PDF (Main Method)
@@ -132,12 +132,10 @@ class SaleReportGenerator:
 
     # get filepath for sales report
     def sale_report_file_path(self):
-        app = QApplication([])
         options = QFileDialog.Options()
         filename, _ = QFileDialog.getSaveFileName(
             None, "Save PDF File", "Sales_Report.pdf", "PDF files (*.pdf)", options=options
         )
-        app.exit()
         return filename
 
     # Daily sales data
