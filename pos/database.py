@@ -334,6 +334,30 @@ class Database:
             print(f"--> Error fetching product name: {e}")
             return None
 
+    # Fetch products stock quantity by id
+    def fetch_product_stock_quantity_by_id(self, product_id):
+        query = "SELECT stock_quantity FROM products WHERE id=%s"
+        params = (product_id,)
+        try:
+            result = self.execute_query(query, params, fetchone=True)
+            return result["stock_quantity"]
+        except Exception as e:
+            print(f"--> Error fetching product stock quantity: {e}")
+            return None
+
+    # Fetch product by id
+    def fetch_product_by_id(self, product_id):
+        query = "SELECT * FROM products WHERE id=%s"
+        params = (product_id,)
+        try:
+            result = self.execute_query(query, params, fetchone=True)
+            return result
+        except Exception as e:
+            print(f"--> Error fetching product: {e}")
+            return None
+
+    # Update product
+
     # Save products table to excel file
     def save_products_table_as_excel_file(self):
         query1 = "SELECT * FROM products"
@@ -436,6 +460,7 @@ class Database:
             print(f"-->Product: ({name}) has been updated successfully!")
         except Exception as e:
             print(f"--> Error updating product: {e}")
+            raise Exception(f"Error updating product{product_id}: {e}")
 
     # Delete a product
     def delete_product(self, product_id):

@@ -785,7 +785,7 @@ QPushButton:checked{
            </rect>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>3</number>
           </property>
           <widget class="QWidget" name="dashboard_page">
            <widget class="QWidget" name="layoutWidget">
@@ -3443,13 +3443,13 @@ QTableWidget{
                  <rect>
                   <x>0</x>
                   <y>300</y>
-                  <width>571</width>
+                  <width>201</width>
                   <height>41</height>
                  </rect>
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_17">
                  <property name="spacing">
-                  <number>300</number>
+                  <number>20</number>
                  </property>
                  <item>
                   <widget class="QPushButton" name="pos_clear_pushButton">
@@ -3690,7 +3690,7 @@ color: white;</string>
                  <rect>
                   <x>210</x>
                   <y>200</y>
-                  <width>361</width>
+                  <width>211</width>
                   <height>39</height>
                  </rect>
                 </property>
@@ -3731,23 +3731,32 @@ QPushButton:hover{
                    </property>
                   </widget>
                  </item>
-                 <item>
-                  <widget class="QPushButton" name="pos_generate_invoice_pushButton">
-                   <property name="maximumSize">
-                    <size>
-                     <width>151</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="font">
-                    <font>
-                     <pointsize>14</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
-                    </font>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true">QPushButton{
+                </layout>
+               </widget>
+               <widget class="QPushButton" name="pos_generate_invoice_pushButton">
+                <property name="geometry">
+                 <rect>
+                  <x>420</x>
+                  <y>300</y>
+                  <width>151</width>
+                  <height>37</height>
+                 </rect>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>151</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>14</pointsize>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QPushButton{
 	border: 1px solid gray;
 	border-radius: 5px;
 	background-color: rgb(0, 0, 222);
@@ -3758,13 +3767,10 @@ QPushButton:hover{
 	font-weight: bold;
 }
 </string>
-                   </property>
-                   <property name="text">
-                    <string>Generate Invoice</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
+                </property>
+                <property name="text">
+                 <string>Generate Invoice</string>
+                </property>
                </widget>
               </widget>
              </item>
@@ -5013,8 +5019,8 @@ QTableWidget{
            <widget class="QLabel" name="label_30">
             <property name="geometry">
              <rect>
-              <x>420</x>
-              <y>280</y>
+              <x>430</x>
+              <y>470</y>
               <width>377</width>
               <height>41</height>
              </rect>
@@ -5028,6 +5034,28 @@ QTableWidget{
             </property>
             <property name="text">
              <string>In Developing Process...</string>
+            </property>
+           </widget>
+           <widget class="QLabel" name="label_31">
+            <property name="geometry">
+             <rect>
+              <x>450</x>
+              <y>150</y>
+              <width>301</width>
+              <height>311</height>
+             </rect>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">border: none; background-color: none;</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap>../assets/icon/web-development.png</pixmap>
+            </property>
+            <property name="scaledContents">
+             <bool>true</bool>
             </property>
            </widget>
           </widget>

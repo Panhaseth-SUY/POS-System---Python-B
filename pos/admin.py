@@ -2,14 +2,16 @@ from PyQt5.QtWidgets import (
     QMainWindow, QApplication, QPushButton, QStackedWidget, QLabel, QTableWidget, QTableWidgetItem, QLineEdit,
     QMessageBox, QComboBox, QSpinBox, QInputDialog, QHeaderView, QAbstractItemView
 )
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5 import uic
 import sys
 import pandas as pd
 from database import Database
+import time
 from sale_report_generator import SaleReportGenerator
 from add_product_dialog import AddProductDialog
 from invoice_generator import InvoiceGenerator
+
 
 class Admin(QMainWindow):
     def __init__(self):
@@ -98,9 +100,47 @@ class Admin(QMainWindow):
     def _change_page(self, index):
         """Change the current page in the stacked widget."""
         self.stackedWidget.setCurrentIndex(index)
+
+        # Using thread to load the page
+        self.thread = QThread()
+        self.thread.run = lambda: self.load_page(index)
+        self.thread.start()
+
+
         
+    def load_page(self, index):
+        # Set time wait for the page to load
+        self.process_status_label.setText("Loading page...")
         if index == 0:
             self.update_dashboard_data()
+
+        elif index == 1:
+            self.reload_all_categories()
+
+        elif index == 2:
+            self.reload_all_products()
+
+        elif index == 3:
+            # Populate the pos category and product
+            self.populate_pos_category()
+            self.populate_pos_products()
+
+            # reload the pos products table
+            self.reload_pos_all_products()
+
+        elif index == 4:
+            # Populate the sales table
+            self.reload_all_sales()
+
+        elif index == 5:
+            # Populate the users table
+            self.reload_all_users()
+        elif index == 6:
+            pass
+        else:
+            pass
+
+        self.process_status_label.setText("Page loaded successfully.")
 
     def signout(self):
         """Handle user signout."""
@@ -251,22 +291,19 @@ class Admin(QMainWindow):
         # Set the column width for categories table
         self.categories_table.setColumnWidth(0, 50)
         self.categories_table.setColumnWidth(1, 150)
-        self.categories_table.setColumnWidth(2, 200)
-        self.categories_table.setColumnWidth(3, 125)
-        self.categories_table.setColumnWidth(4, 125)
+        self.categories_table.setColumnWidth(2, 225)
+        self.categories_table.setColumnWidth(3, 110)
+        self.categories_table.setColumnWidth(4, 110)
 
         # Set the column width for category products table
         self.category_products_table.setColumnWidth(0, 50)
         self.category_products_table.setColumnWidth(1, 270)
-        self.category_products_table.setColumnWidth(2, 120)
-        self.category_products_table.setColumnWidth(3, 120)
+        self.category_products_table.setColumnWidth(2, 110)
+        self.category_products_table.setColumnWidth(3, 110)
 
-        # Populate the table with data
-        self.reload_all_categories()
-        
     def _connect_category_signals(self):
         # Connect signals for category management
-        self.categories_table.cellDoubleClicked.connect(lambda row, column: self.reload_category_products(self.categories_table.item(row, 0).text()))
+        self.categories_table.cellClicked.connect(lambda row, column: self.reload_category_products(self.categories_table.item(row, 0).text()))
 
     def reload_all_categories(self):
         self.process_status_label.setText("Reloading categories table...")
@@ -339,9 +376,6 @@ class Admin(QMainWindow):
         self.reload_products_button.clicked.connect(self.reload_all_products)
         self.search_product_button.clicked.connect(self.search_product)
         self.search_product_lineedit.textChanged.connect(self.search_product)
-
-        # Populate the products table
-        self.reload_all_products()
 
     def add_product(self):
         try:
@@ -531,13 +565,6 @@ class Admin(QMainWindow):
         self.pos_invoice_table.setColumnWidth(3, 80)
         self.pos_invoice_table.setColumnWidth(4, 120)
 
-        # Populate the pos category and product
-        self.populate_pos_category()
-        self.populate_pos_products()
-
-        # reload the pos products table
-        self.reload_pos_all_products()
-
     def _connect_pos_signals(self):
         # Connect signals for the pos management
         self.pos_add_to_cart_button.clicked.connect(self.add_product_to_cart)
@@ -581,6 +608,17 @@ class Admin(QMainWindow):
 
         if product_id is None or quantity <= 0:
             self._show_error_message("Invalid product or quantity.")
+            return
+
+        # Validate product quantity
+        stock_quantity = self.db.fetch_product_stock_quantity_by_id(product_id)
+        current_quantity_in_cart = 0
+        for row in range(self.pos_invoice_table.rowCount()):
+            if self.pos_invoice_table.item(row, 0).text() == str(product_id):
+                current_quantity_in_cart += int(self.pos_invoice_table.item(row, 3).text())
+        
+        if stock_quantity < quantity + current_quantity_in_cart:
+            self._show_error_message(f"Not enough stock. Only {stock_quantity} available.")
             return
 
         try:
@@ -642,7 +680,7 @@ class Admin(QMainWindow):
 
         # Set the column headers
         self.pos_preview_table.setColumnCount(6)
-        self.pos_preview_table.setHorizontalHeaderLabels(["ID", "Name", "Price ($)", "Categories", "SKU", "Description"])
+        self.pos_preview_table.setHorizontalHeaderLabels(["ID", "Name", "Price ($)", "Categories", "Quantity", "Description"])
 
         product = self.pos_products
 
@@ -657,7 +695,7 @@ class Admin(QMainWindow):
                 self.pos_preview_table.setItem(row_index, 2, QTableWidgetItem(f"{product['price']:.2f}"))
                 category = self.db.fetch_category_by_id(product['category_id'])
                 self.pos_preview_table.setItem(row_index, 3, QTableWidgetItem(category['name']))
-                self.pos_preview_table.setItem(row_index, 4, QTableWidgetItem(product['sku']))
+                self.pos_preview_table.setItem(row_index, 4, QTableWidgetItem(str(product['stock_quantity'])))
                 self.pos_preview_table.setItem(row_index, 5, QTableWidgetItem(product['description']))            
 
             # set column to fit with table width
@@ -753,7 +791,12 @@ class Admin(QMainWindow):
                 price = float(self.pos_invoice_table.item(row, 2).text())
                 sub_total = float(self.pos_invoice_table.item(row, 4).text())
                 self.db.add_sale_item(sale_id, product_id, quantity, price, sub_total)
-            
+
+                # Update stock
+                current_stock = self.db.fetch_product_stock_quantity_by_id(product_id)
+                new_stock = current_stock - quantity
+                self.db.update_product(product_id=product_id, stock_quantity=new_stock)
+
             # Invoice PDF generation
             invoice_generator = InvoiceGenerator(Database=self.db)
             invoice_file_path = invoice_generator.generate()
@@ -765,13 +808,15 @@ class Admin(QMainWindow):
             self.clear_cart()
             self.update_totals()
 
+            # Reload the products table
+            self.filter_product_by_category()
+
             self.process_status_label.setText("Invoice generated successfully.")
             self._show_info_message("Invoice generated successfully.")
         except Exception as e:
             print(f"Error generating invoice: {e}")
             self._show_error_message("Failed to generate invoice.")
-            self.clear_cart()
-            self.process_status_label.setText("")
+            self.process_status_label.setText("Failed to generate invoice.")
 
 
     #! Sale Management Functions ==========================================================================
@@ -797,9 +842,6 @@ class Admin(QMainWindow):
         self.reload_sale_button.clicked.connect(self.reload_all_sales)
         self.search_sale_button.clicked.connect(self.search_sales)
         self.search_sale_lineedit.textChanged.connect(self.search_sales)
-
-        # Populate the sales table
-        self.reload_all_sales()
 
     def update_sale(self):
         selected_row = self.sales_table.currentRow()
@@ -937,13 +979,9 @@ class Admin(QMainWindow):
         # Initialize the user widget here
         self.users_table = self.findChild(QTableWidget, 'users_tableWidget')
 
-
         # Set the column headers
         self.users_table.setColumnCount(8)
         self.users_table.setHorizontalHeaderLabels(["ID", "Name", "Role", "Username", "Password", "Status", "Created At", "Updated At"])
-
-        # Populate the table with data
-        self.reload_all_users()
 
     def _connect_users_signals(self):
         # Connect signals for user management
@@ -1007,7 +1045,23 @@ class Admin(QMainWindow):
         self.users = self.db.fetch_all_users()
         self.reload_users_table()
 
+class PageLoaderThread(QThread):
+    progress_signal = pyqtSignal(str)  # Signal to send progress updates
+    error_signal = pyqtSignal(str)     # Signal to notify errors
+    finished_signal = pyqtSignal()    # Signal to notify successful completion
 
+    def __init__(self, index, parent=None):
+        super().__init__(parent)
+        self.index = index
+
+    def run(self):
+        try:
+            for i in range(5):  # Simulate a page-loading task
+                time.sleep(1)  # Simulate delay
+                self.progress_signal.emit(f"Loading step {i + 1}/5 for page {self.index}")
+            self.finished_signal.emit()
+        except Exception as e:
+            self.error_signal.emit(str(e))
 
 # TODO: Run Admin Page
 if __name__ == "__main__":
