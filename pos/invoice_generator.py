@@ -7,9 +7,8 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 import os
 
 class InvoiceGenerator:
-    def __init__(self, invoice_id=None):
-        self.db = Database()
-        self.generate(invoice_id)
+    def __init__(self, Database=Database()):
+        self.db = Database
 
     def generate(self, invoice_id=None):
         sale_id = invoice_id or self.db.get_last_sale_id()
@@ -41,18 +40,27 @@ class InvoiceGenerator:
         try:
             doc.build(elements, onFirstPage=self.add_header_footer)
             print(f"Invoice PDF successfully created: {filename}")
+            return filename
         except Exception as e:
             print(f"Error generating invoice PDF: {e}")
         finally:
-            self.db.close_connection()
+            # self.db.close_connection()
+            pass
 
     # Open file dialog to select invoice file path
     def invoice_file_path(self, sale_id=None):
-        app = QApplication([])
-        options = QFileDialog.Options()
-        filename, _ = QFileDialog.getSaveFileName(None, "Save PDF File", f"Invoice-({sale_id}).pdf", "PDF files (*.pdf)", options=options)
-        app.exit()
+        # app = QApplication([])
+        # options = QFileDialog.Options()
+        default_dir = os.path.expanduser("~/desktop/pos_system/assets/invoice_pdf")
+        # if not os.path.exists(default_dir):
+        #     os.makedirs(default_dir)
+        # filename, _ = QFileDialog.getSaveFileName(None, "Save PDF File", os.path.join(default_dir, f"Invoice-({sale_id}).pdf"), "PDF files (*.pdf)", options=options)
+        # # # app.exit()
+        if not os.path.exists(default_dir):
+            os.makedirs(default_dir)
+        filename = os.path.join(default_dir, f"Invoice-({sale_id}).pdf")
         return filename
+
 
     # Fetch sales data and sale items data from the database based on the given sale ID
     def fetch_sales_data(self, sale_id):
@@ -135,7 +143,7 @@ class InvoiceGenerator:
         elements.append(contact_paragraph)
         phone = Paragraph(f"Phone: +1 123-456-7890", style=ParagraphStyle(name='Normal', fontSize=8))
         elements.append(phone)
-        email = Paragraph(f"Email: panhaseth453@gmail.", style=ParagraphStyle(name='Normal', fontSize=8))
+        email = Paragraph(f"Email: panhaseth453@gmail.com", style=ParagraphStyle(name='Normal', fontSize=8))
         elements.append(email)
         address = Paragraph(f"Address: Phnom Penh, Chroy Changvar, Prek Leab, NR6.", style=ParagraphStyle(name='Normal', fontSize=8))
         elements.append(address)
@@ -164,4 +172,4 @@ class InvoiceGenerator:
 
 
 if __name__ == "__main__":
-    invoice_generator = InvoiceGenerator()
+    invoice_generator = InvoiceGenerator().generate()

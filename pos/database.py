@@ -3,6 +3,8 @@ import mysql.connector
 import pandas as pd
 from PyQt5.QtWidgets import QApplication, QFileDialog
 import datetime
+from datetime import datetime
+from collections import defaultdict
 class Database:
     def __init__(self, host="127.0.0.1", username="root", password="Tokata@se7en232722", database="POS_DB"):
         self.host = host
@@ -154,6 +156,16 @@ class Database:
             print(f"--> Error fetching users: {e}")
             return None
 
+    # Fetch number of users
+    def fetch_number_of_users(self):
+        query = "SELECT COUNT(*) as total_users FROM users"
+        try:
+            result = self.execute_query(query, fetchone=True)
+            return result['total_users']
+        except Exception as e:
+            print(f"--> Error counting users: {e}")
+            return None
+
     # fetch a user by id
     def fetch_user_by_id(self, user_id):
         query = "SELECT * FROM users WHERE id=%s"
@@ -301,6 +313,27 @@ class Database:
             print(f"--> Error fetching products: {e}")
             return None
 
+    # Fetch number of products
+    def fetch_number_of_products(self):
+        query = "SELECT COUNT(*) AS total FROM products WHERE isDeleted = False"
+        try:
+            result = self.execute_query(query, fetchone=True)
+            return result["total"]
+        except Exception as e:
+            print(f"--> Error fetching number of products: {e}")
+            return None
+
+    # Fetch products name by id 
+    def fetch_product_name_by_id(self, product_id):
+        query = "SELECT name FROM products WHERE id=%s"
+        params = (product_id,)
+        try:
+            result = self.execute_query(query, params, fetchone=True)
+            return result["name"]
+        except Exception as e:
+            print(f"--> Error fetching product name: {e}")
+            return None
+
     # Save products table to excel file
     def save_products_table_as_excel_file(self):
         query1 = "SELECT * FROM products"
@@ -355,6 +388,17 @@ class Database:
             return result
         except Exception as e:
             print(f"--> Error fetching product by ID: {e}")
+            return None
+
+    # Fetch a product by category id
+    def fetch_products_by_category(self, category_id):
+        query = "SELECT * FROM products WHERE isDeleted=False AND category_id=%s"
+        params = (category_id,)
+        try:
+            results = self.execute_query(query, params, fetchall=True)
+            return results
+        except Exception as e:
+            print(f"--> Error fetching product by category ID: {e}")
             return None
 
     # Update a product
@@ -444,6 +488,7 @@ class Database:
             return False
 
 
+
     #! Add a category --------------------------------------------------------------
     def add_category(self, name, description=None):
         query = "INSERT INTO categories(name, description) VALUES(%s, %s)"
@@ -491,6 +536,16 @@ class Database:
             print(f"--> Error fetching categories: {e}")
             return None
         
+    # Fetch number of categories
+    def fetch_number_of_categories(self):
+        query = "SELECT COUNT(*) as total_categories FROM categories WHERE isDeleted=False"
+        try:
+            result = self.execute_query(query, fetchone=True)
+            return result["total_categories"]
+        except Exception as e:
+            print(f"--> Error fetching number of categories: {e}")
+            return None
+
     # Fetch a category by ID
     def fetch_category_by_id(self, category_id):
         query = "SELECT * FROM categories WHERE isDeleted=False AND id=%s"
@@ -500,6 +555,17 @@ class Database:
             return result
         except Exception as e:
             print(f"--> Error fetching category by ID: {e}")
+            return None
+
+    # Fetch categories name by category ID
+    def fetch_category_name_by_id(self, category_id):
+        query = "SELECT name FROM categories WHERE isDeleted=FALSE AND id=%s"
+        params = (category_id,)
+        try:
+            result = self.execute_query(query, params, fetchone=True)
+            return result["name"]
+        except Exception as e:
+            print(f"--> Error fetching category name by ID: {e}")
             return None
 
     # Fetch a category by name
@@ -565,7 +631,7 @@ class Database:
 
 
     #! Add a sale --------------------------------------------------------------
-    def add_sale(self, total_amount, cashier_id, cashier_name, payment_method, date=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')):
+    def add_sale(self, total_amount, cashier_id, cashier_name, payment_method, date=datetime.now().strftime('%Y-%m-%d %H:%M:%S')):
         query = "INSERT INTO sales(date, total_amount, cashier_id, cashier_name, payment_method) VALUES(%s, %s, %s, %s, %s)"
         params = (date, total_amount, cashier_id, cashier_name, payment_method)
         try:
@@ -622,6 +688,47 @@ class Database:
             print(f"--> Error fetching sales: {e}")
             return None
 
+    # Fetch number of sales
+    def fetch_number_of_sales(self):
+        query = "SELECT COUNT(*) as total_sales FROM sales"
+        try:
+            result = self.execute_query(query, fetchone=True)
+            return result["total_sales"]
+        except Exception as e:
+            print(f"--> Error fetching number of sales: {e}")
+            return None
+    
+    # Fetch top 5 most active sales of the month
+    def fetch_top_5_most_active_users(self):
+        query = "SELECT cashier_name, COUNT(*) as total_sales FROM sales GROUP BY cashier_name ORDER BY total_sales DESC LIMIT 5"
+        try:
+            results = self.execute_query(query, fetchall=True)
+            return results
+        except Exception as e:
+            print(f"--> Error fetching top 5 most active sales: {e}")
+            return None
+
+    # Fetch daily sales data
+    def fetch_daily_sales_data(self, data = None):
+        if data is None:
+            data = self.fetch_all_sales()
+        else: 
+            data = data
+        # Get daily sales
+        daily_sales = defaultdict(float)
+        for sale in data:
+            date = sale["date"].strftime('%Y-%m-%d')
+            daily_sales[date] += float(sale["total_amount"])
+
+        daily_sale_data = [{"date": datetime.strptime(date, '%Y-%m-%d'), "total_amount": amount} for date, amount in daily_sales.items()]
+
+        # Sort sales data by date
+        data = sorted(daily_sale_data, key=lambda x: x["date"])
+
+        return data
+
+
+    # Fetch sales by date range
     def fetch_sales_by_date_range(self, start_date, end_date):
         query = "SELECT * FROM sales WHERE date BETWEEN %s AND %s"
         params = (start_date, end_date)
@@ -746,6 +853,44 @@ class Database:
             return results
         except Exception as e:
             print(f"--> Error fetching sale items by sale ID: {e}")
+            return None
+
+        
+    #Fetch top products and categories
+    def fetch_total_sales_per_product(self):
+        query = "SELECT product_id, SUM(quantity) as total_sales FROM sales_items GROUP BY product_id ORDER BY total_sales DESC"
+        try:
+            results = self.execute_query(query, fetchall=True)
+            return results
+        except Exception as e:
+            print(f"--> Error fetching total sales per product: {e}")
+            return None
+        
+    def fetch_total_sales_per_category(self):
+        query = "SELECT p.category_id, SUM(si.quantity) as total_sales FROM sales_items si JOIN products p ON si.product_id = p.id GROUP BY p.category_id ORDER BY total_sales DESC"
+        try:
+            results = self.execute_query(query, fetchall=True)
+            return results
+        except Exception as e:
+            print(f"--> Error fetching total sales per category: {e}")
+            return None
+
+    def fetch_top_5_most_sold_products(self):
+        query = "SELECT product_id, SUM(quantity) as total_sales FROM sales_items GROUP BY product_id ORDER BY total_sales DESC LIMIT 5"
+        try:
+            results = self.execute_query(query, fetchall=True)
+            return results
+        except Exception as e:
+            print(f"--> Error fetching top 10 most sold products: {e}")
+            return None
+        
+    def fetch_top_5_most_sold_categories(self):
+        query = "SELECT p.category_id, SUM(si.quantity) as total_sales FROM sales_items si JOIN products p ON si.product_id = p.id GROUP BY p.category_id ORDER BY total_sales DESC LIMIT 5"
+        try:
+            results = self.execute_query(query, fetchall=True)
+            return results
+        except Exception as e:
+            print(f"--> Error fetching top 5 most sold categories: {e}")
             return None
 
     # Update a sale item

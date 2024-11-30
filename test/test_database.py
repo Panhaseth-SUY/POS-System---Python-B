@@ -178,8 +178,14 @@ if __name__ == '__main__':
     # db.add_sale_item(531, 2038, 10, 0.50, 5.00)
 
 
+    # fetch top category
+    # pprint(db.fetch_top_categories())
 
+    # fetch top 5 categories
+    # pprint(db.fetch_top_5_most_sold_categories())
 
+    # fetch daily sale data
+    # pprint(db.fetch_daily_sales_data())
 
 
 
