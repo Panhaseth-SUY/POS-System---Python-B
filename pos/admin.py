@@ -2,12 +2,11 @@ from PyQt5.QtWidgets import (
     QMainWindow, QApplication, QPushButton, QStackedWidget, QLabel, QTableWidget, QTableWidgetItem, QLineEdit,
     QMessageBox, QComboBox, QSpinBox, QInputDialog, QHeaderView, QAbstractItemView
 )
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
+from PyQt5.QtCore import Qt
 from PyQt5 import uic
 import sys
 import pandas as pd
 from database import Database
-import time
 from sale_report_generator import SaleReportGenerator
 from add_product_dialog import AddProductDialog
 from invoice_generator import InvoiceGenerator
@@ -88,29 +87,29 @@ class Admin(QMainWindow):
     def _connect_signals(self):
         """Connect signals to their respective slots."""
         # Sidebar navigation
-        self.dashboard_button.clicked.connect(lambda: self._change_page(0))
-        self.categories_button.clicked.connect(lambda: self._change_page(1))
-        self.products_button.clicked.connect(lambda: self._change_page(2))
-        self.pos_button.clicked.connect(lambda: self._change_page(3))
-        self.sales_button.clicked.connect(lambda: self._change_page(4))
-        self.users_button.clicked.connect(lambda: self._change_page(5))
-        self.setting_button.clicked.connect(lambda: self._change_page(6))
+        self.dashboard_button.clicked.connect(lambda: self._change_page(0, self.dashboard_button))
+        self.categories_button.clicked.connect(lambda: self._change_page(1, self.categories_button))
+        self.products_button.clicked.connect(lambda: self._change_page(2, self.products_button))
+        self.pos_button.clicked.connect(lambda: self._change_page(3, self.pos_button))
+        self.sales_button.clicked.connect(lambda: self._change_page(4, self.sales_button))
+        self.users_button.clicked.connect(lambda: self._change_page(5, self.users_button))
+        self.setting_button.clicked.connect(lambda: self._change_page(6, self.setting_button))
         self.signout_button.clicked.connect(self.signout)
 
-    def _change_page(self, index):
+    def _change_page(self, index, button=None):
         """Change the current page in the stacked widget."""
+        self.process_status_label.setText("Loading page...")
+        if button:
+            button.setEnabled(False)
+        
+        # Set the current index of the stacked widget
         self.stackedWidget.setCurrentIndex(index)
 
-        # Using thread to load the page
-        self.thread = QThread()
-        self.thread.run = lambda: self.load_page(index)
-        self.thread.start()
+        # Load the page in a separate thread
+        self.load_page(index, button)
 
-
-        
-    def load_page(self, index):
+    def load_page(self, index, button=None):
         # Set time wait for the page to load
-        self.process_status_label.setText("Loading page...")
         if index == 0:
             self.update_dashboard_data()
 
@@ -141,6 +140,8 @@ class Admin(QMainWindow):
             pass
 
         self.process_status_label.setText("Page loaded successfully.")
+        if button:
+            button.setEnabled(True)
 
     def signout(self):
         """Handle user signout."""
@@ -555,6 +556,7 @@ class Admin(QMainWindow):
         self.pos_search_button = self.findChild(QPushButton, "pos_search_pushButton")
         self.pos_preview_table = self.findChild(QTableWidget, "pos_preview_tableWidget")
         self.pos_generate_invoice_button = self.findChild(QPushButton, "pos_generate_invoice_pushButton")
+        self.pos_product_option_comboBox = self.findChild(QComboBox, "pos_product_option_comboBox")
 
         # Configure invoice table
         self.pos_invoice_table.setSelectionBehavior(QTableWidget.SelectRows)
@@ -573,10 +575,31 @@ class Admin(QMainWindow):
         self.pos_search_button.clicked.connect(self.pos_search_product)
         self.pos_search_lineEdit.textChanged.connect(self.pos_search_product)
         self.pos_category_comboBox.currentIndexChanged.connect(self.filter_product_by_category)
+        self.pos_product_option_comboBox.currentIndexChanged.connect(self.pos_option)
         self.pos_reload_products_table_button.clicked.connect(self.reload_pos_all_products)
         self.pos_invoice_table.cellDoubleClicked.connect(lambda row, col: self.edit_quantity(row, col))
         self.pos_generate_invoice_button.clicked.connect(self.generate_invoice)
+        self.pos_preview_table.cellClicked.connect(self.addToBox)
 
+    def pos_option(self):
+        """Set the option for the product combo box."""
+        option = self.pos_product_option_comboBox.currentText()
+        if option == "Manual":
+            self.pos_product_comboBox.currentIndexChanged.disconnect(self.add_product_to_cart)
+        elif option == "Auto":
+            self.pos_product_comboBox.currentIndexChanged.connect(self.add_product_to_cart)
+        else:
+            pass
+        
+    def addToBox(self, row, col):
+        # Add selected product to the preview table
+        product_id = int(self.pos_preview_table.item(row, 0).text())
+        product_name = self.pos_preview_table.item(row, 1).text()
+
+        # Set the product name in the product combo box
+        self.pos_product_comboBox.setCurrentText(product_name)
+        self.pos_product_comboBox.setCurrentIndex(self.pos_product_comboBox.findData(product_id))
+            
     def populate_pos_category(self):
         # Populate the pos category combo box with data from the database
         self.pos_category_comboBox.clear()
@@ -593,11 +616,19 @@ class Admin(QMainWindow):
     def populate_pos_products(self):
         # Populate the pos product combo box with data from the database
         self.pos_product_comboBox.clear()
-
+        products = self.db.fetch_all_products()
+        # Adding product name to the pos product combo box
         try:
-            products = self.db.fetch_all_products()
             for product in products:
                 self.pos_product_comboBox.addItem(product['name'], product['id'])
+        except Exception as e:
+            print(f"Error loading products: {e}")
+            self._show_error_message("Failed to load products.")
+
+        # Adding barcode to the pos product combo box
+        try:
+            for product in products:
+                self.pos_product_comboBox.addItem(product['barcode'], product['id'])
         except Exception as e:
             print(f"Error loading products: {e}")
             self._show_error_message("Failed to load products.")
@@ -636,9 +667,12 @@ class Admin(QMainWindow):
                 self.combine_duplicates()
             else:
                 self._show_error_message("Product not found.")
+            if self.pos_product_option_comboBox.currentText() == "Auto":
+                self.pos_product_comboBox.setCurrentText('')
         except Exception as e:
             print(f"Error adding product to cart: {e}")
             self._show_error_message("Failed to add product to cart.")
+            self.process_status_label.setText("")
         finally:
             self.pos_quantity_spinBox.setValue(1)  # Reset the quantity spin box
 
@@ -1045,23 +1079,7 @@ class Admin(QMainWindow):
         self.users = self.db.fetch_all_users()
         self.reload_users_table()
 
-class PageLoaderThread(QThread):
-    progress_signal = pyqtSignal(str)  # Signal to send progress updates
-    error_signal = pyqtSignal(str)     # Signal to notify errors
-    finished_signal = pyqtSignal()    # Signal to notify successful completion
 
-    def __init__(self, index, parent=None):
-        super().__init__(parent)
-        self.index = index
-
-    def run(self):
-        try:
-            for i in range(5):  # Simulate a page-loading task
-                time.sleep(1)  # Simulate delay
-                self.progress_signal.emit(f"Loading step {i + 1}/5 for page {self.index}")
-            self.finished_signal.emit()
-        except Exception as e:
-            self.error_signal.emit(str(e))
 
 # TODO: Run Admin Page
 if __name__ == "__main__":

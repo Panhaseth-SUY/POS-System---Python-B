@@ -21,7 +21,11 @@
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: (236, 236, 236);
-font: 12pt &quot;Arial&quot;;</string>
+font: 12pt &quot;Arial&quot;;
+
+QLineEdit{
+	color: lightgray;
+}</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QWidget" name="layoutWidget">
@@ -3579,8 +3583,8 @@ QPushButton:hover{
                <widget class="QWidget" name="layoutWidget">
                 <property name="geometry">
                  <rect>
-                  <x>30</x>
-                  <y>100</y>
+                  <x>40</x>
+                  <y>110</y>
                   <width>521</width>
                   <height>39</height>
                  </rect>
@@ -3601,7 +3605,7 @@ QPushButton:hover{
                     <widget class="QLabel" name="label_20">
                      <property name="font">
                       <font>
-                       <pointsize>17</pointsize>
+                       <pointsize>16</pointsize>
                        <weight>75</weight>
                        <bold>true</bold>
                       </font>
@@ -3645,7 +3649,7 @@ color: white;</string>
                     <widget class="QLabel" name="label_22">
                      <property name="font">
                       <font>
-                       <pointsize>17</pointsize>
+                       <pointsize>16</pointsize>
                        <weight>75</weight>
                        <bold>true</bold>
                       </font>
@@ -3771,6 +3775,49 @@ QPushButton:hover{
                 <property name="text">
                  <string>Generate Invoice</string>
                 </property>
+               </widget>
+               <widget class="QComboBox" name="pos_product_option_comboBox">
+                <property name="geometry">
+                 <rect>
+                  <x>480</x>
+                  <y>20</y>
+                  <width>81</width>
+                  <height>30</height>
+                 </rect>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>10</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>12</pointsize>
+                 </font>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">padding: 5px;
+border-radius: 10px;
+border: 1px solid gray;
+color: black</string>
+                </property>
+                <property name="editable">
+                 <bool>true</bool>
+                </property>
+                <property name="currentText">
+                 <string>Manual</string>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>Manual</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Auto</string>
+                 </property>
+                </item>
                </widget>
               </widget>
              </item>
