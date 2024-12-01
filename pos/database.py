@@ -133,8 +133,6 @@ class Database:
 
 
 
-
-
     #! Add a user -----------------------------------------------------
     def add_user(self, name, username, password, role):
         hash_password = self.hash_password(password)
@@ -149,6 +147,16 @@ class Database:
     # Fetch all users
     def fetch_all_users(self):
         query = "SELECT * FROM users"
+        try:
+            results = self.execute_query(query, fetchall=True)
+            return results
+        except Exception as e:
+            print(f"--> Error fetching users: {e}")
+            return None
+
+    # Fetch all user id  from database
+    def fetch_all_user_id(self):
+        query = "SELECT id FROM users"
         try:
             results = self.execute_query(query, fetchall=True)
             return results
@@ -188,8 +196,20 @@ class Database:
             print(f"--> Error fetching user by username: {e}")
             return None
         
+    # Fetch users by name 
+    def fetch_users_by_name(self, name):
+        query = "SELECT * FROM users WHERE name LIKE %s"
+        params = (f"%{name}%",)
+        try:
+            results = self.execute_query(query, params, fetchall=True)
+            return results
+        except Exception as e:
+            print(f"--> Error fetching users by name: {e}")
+            return None
+
     # Update a user
-    def update_user(self, username=None, name=None, password=None, role=None, status=None):
+    def update_user(self, user_id=None, username=None, name=None, password=None, role=None, status=None):
+
         query = "UPDATE users SET "
         params = []
         if name:
@@ -204,9 +224,12 @@ class Database:
         if status:
             query += "status=%s, "
             params.append(status)
+        if username:
+            query += "username=%s, "
+            params.append(username)
 
-        query = query.rstrip(", ") + " WHERE username=%s"
-        params.append(username)
+        query = query.rstrip(", ") + " WHERE id=%s"
+        params.append(user_id)
 
         try:
             self.execute_query(query, params)
@@ -216,6 +239,11 @@ class Database:
 
     # Delete a user
     def delete_user(self, username):
+        # Check if the user is referenced in any table
+        if self.is_user_referenced(username):
+            print(f"--> Error: Cannot delete user {username} as they are referenced in other tables.")
+            raise Exception("Error deleting user: User is referenced in other tables.")
+
         query = "DELETE FROM users WHERE username=%s"
         params = (username,)
         try:
@@ -223,6 +251,17 @@ class Database:
             print(f"-->{username} has been deleted successfully!")
         except Exception as e:
             print(f"--> Error deleting user: {e}")
+
+    def is_user_referenced(self, username):
+        # Check if the user is referenced in the sales table
+        query = "SELECT COUNT(*) as count FROM sales WHERE cashier_name = %s"
+        params = (username,)
+        try:
+            result = self.execute_query(query, params, fetchone=True)
+            return result['count'] > 0
+        except Exception as e:
+            print(f"--> Error checking if user is referenced: {e}")
+            return False
 
     # Clear all users except admin
     def clear_all_users(self):
@@ -245,10 +284,10 @@ class Database:
                 return result
             else:
                 print("--> Invalid credentials or user status is not active.")
-                return False
+                raise Exception("Invalid credentials or user status is not active.")
         except Exception as e:
             print(f"--> Error authenticating user: {e}")
-            return False
+            raise Exception("Invalid credentials or user status is not active.")
 
     # Hash a password
     def hash_password(self, password):
@@ -787,7 +826,7 @@ class Database:
             return None
 
     # Update a sale
-    def update_sale(self, sale_id, total_amount=None, cashier_id=None, cashier_name=None, payment_method=None):
+    def update_sale(self, sale_id, total_amount=None, cashier_id=None, cashier_name=None, payment_method=None, status=None):
         query = "UPDATE sales SET "
         params = []
 
@@ -801,8 +840,11 @@ class Database:
             query += "payment_method=%s, "
             params.append(payment_method)
         if cashier_name:
-            query += "cashier_name=%s "
+            query += "cashier_name=%s, "
             params.append(cashier_name)
+        if status:
+            query += "status=%s "
+            params.append(status)
 
         query = query.rstrip(", ") + " WHERE id=%s"
         params.append(sale_id)

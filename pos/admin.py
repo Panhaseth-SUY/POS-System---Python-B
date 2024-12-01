@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import (
     QMessageBox, QComboBox, QSpinBox, QInputDialog, QHeaderView, QAbstractItemView
 )
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont
 from PyQt5 import uic
 import sys
 import pandas as pd
@@ -11,11 +12,13 @@ from sale_report_generator import SaleReportGenerator
 from add_product_dialog import AddProductDialog
 from invoice_generator import InvoiceGenerator
 
-
 class Admin(QMainWindow):
-    def __init__(self):
+    def __init__(self, user=None):
         super(Admin, self).__init__()
 
+        # Store the user information
+        self.user = user
+        
         # Initialize the database connection
         self.db = Database()
 
@@ -54,9 +57,36 @@ class Admin(QMainWindow):
         self._initialize_user_widget()
         self._connect_users_signals()
 
-        # Set POS page as the first page in the navigation
-        self._change_page(3)
-        self.pos_button.setChecked(True)
+        
+
+        # Set the user information
+        self.user_name.setFont(QFont('Arial', 20, QFont.Bold))  # Set the font
+        self.user_name.setText(f"Hello, {self.user['name']} ({self.user['role']})")  # Set the text
+
+        # Check user role
+        if self.user['role'] == 'Cashier':
+            self.dashboard_button.hide()
+            self.categories_button.hide()
+            self.users_button.hide()
+            self.products_button.hide()
+            self.sales_button.hide()
+
+            # Set POS page as the first page in the navigation
+            self._change_page(3)
+            self.pos_button.setChecked(True)
+
+        elif self.user['role'] == 'Manager':
+            self.users_button.hide()
+            self.pos_button.hide()
+
+            # Set the dashboard page as the first page in the navigation
+            self._change_page(0)
+            self.dashboard_button.setChecked(True)
+
+        else:
+            # Set the dashboard page as the first page in the navigation
+            self._change_page(0)
+            self.dashboard_button.setChecked(True)
 
         # Show the application
         self.show()
@@ -79,7 +109,7 @@ class Admin(QMainWindow):
 
         # User information
         self.user_name = self.findChild(QLabel, 'user_name')
-        self.user_picture = self.findChild(QLabel, 'user_picture')
+        # self.user_picture = self.findChild(QLabel, 'user_picture')
 
         # Stacked widget for pages
         self.stackedWidget = self.findChild(QStackedWidget, 'stackedWidget')
@@ -145,7 +175,12 @@ class Admin(QMainWindow):
 
     def signout(self):
         """Handle user signout."""
-        self.close()
+        from login import Login
+        self.hide()
+        self.deleteLater()
+        self.login = Login()
+        self.login.show()
+        self.db.close_connection()
 
     def _show_error_message(self, message):
         """Display an error message to the user."""
@@ -586,11 +621,19 @@ class Admin(QMainWindow):
         option = self.pos_product_option_comboBox.currentText()
         if option == "Manual":
             self.pos_product_comboBox.currentIndexChanged.disconnect(self.add_product_to_cart)
+            # self.pos_product_comboBox.currentTextChanged.disconnect(self.add_product_to_cart)
         elif option == "Auto":
             self.pos_product_comboBox.currentIndexChanged.connect(self.add_product_to_cart)
+            # self.pos_product_comboBox.currentTextChanged.connect(self.findIndexForText)
         else:
-            pass
+            self.pos_product_comboBox.currentIndexChanged.disconnect(self.add_product_to_cart)
+            # self.pos_product_comboBox.currentTextChanged.disconnect(self.add_product_to_cart)
         
+    def findIndexForText(self):
+        text = self.pos_product_comboBox.currentText()
+        index = self.pos_product_comboBox.findText(text)
+        self.pos_product_comboBox.setCurrentIndex(index)
+
     def addToBox(self, row, col):
         # Add selected product to the preview table
         product_id = int(self.pos_preview_table.item(row, 0).text())
@@ -669,6 +712,7 @@ class Admin(QMainWindow):
                 self._show_error_message("Product not found.")
             if self.pos_product_option_comboBox.currentText() == "Auto":
                 self.pos_product_comboBox.setCurrentText('')
+                # self.pos_product_comboBox.setCurrentIndex(-1)
         except Exception as e:
             print(f"Error adding product to cart: {e}")
             self._show_error_message("Failed to add product to cart.")
@@ -802,7 +846,7 @@ class Admin(QMainWindow):
 
         try:
             total = self.total
-            cashier_id = 1
+            cashier_id = self.user['id']
             cashier_name = self.db.fetch_user_by_id(cashier_id)
             cashier_name = cashier_name['name']
 
@@ -876,6 +920,45 @@ class Admin(QMainWindow):
         self.reload_sale_button.clicked.connect(self.reload_all_sales)
         self.search_sale_button.clicked.connect(self.search_sales)
         self.search_sale_lineedit.textChanged.connect(self.search_sales)
+        self.sales_table.cellDoubleClicked.connect(lambda row, col: self.edit_sale(row, col))
+
+    def edit_sale(self, row, col):
+        # Get total amount of sales
+        if col == 2:
+            current_total = float(self.sales_table.item(row, col).text())
+            total, ok = QInputDialog.getDouble(self, "Edit Total Amount", "Enter new total amount:", value=current_total)
+            if ok:
+                self.sales_table.setItem(row, col, QTableWidgetItem(f"{total:.2f}"))
+                self.update_sale()
+
+        # Get cashier ID of sales
+        elif col == 3:
+            cashier_ids = self.db.fetch_all_user_id()
+            cashier_id_list = [str(i['id']) for i in cashier_ids]
+            id, ok = QInputDialog.getItem(self, "Edit Cashier ID", "Enter new cashier ID:", cashier_id_list, 0, False)
+            
+            if ok:
+                self.sales_table.setItem(row, col, QTableWidgetItem(f"{id}"))
+                self.update_sale()
+
+        # Get payment method of sales
+        elif col == 5:
+            payment_methods = ["Cash", "Card", "Digital Wallet"]
+            payment_method, ok = QInputDialog.getItem(self, "Edit Payment Method", "Select payment method:", payment_methods, 0, False)
+            if ok:
+                self.sales_table.setItem(row, col, QTableWidgetItem(payment_method))
+                self.update_sale()
+
+        # Get status of sales
+        elif col == 6:
+            statuses = ['Completed', 'Pending', 'Canceled']
+            status, ok = QInputDialog.getItem(self, "Edit Status", "Select status:", statuses, 0, False)
+            if ok:
+                self.sales_table.setItem(row, col, QTableWidgetItem(status))
+                self.update_sale()
+
+        else:
+            return
 
     def update_sale(self):
         selected_row = self.sales_table.currentRow()
@@ -888,13 +971,14 @@ class Admin(QMainWindow):
         cashier_id = self.sales_table.item(selected_row, 3).text()
         cashier_name = self.sales_table.item(selected_row, 4).text()
         payment_method = self.sales_table.item(selected_row, 5).text()
+        status = self.sales_table.item(selected_row, 6).text()
 
         if not cashier_name:
             cashier_name = self.db.fetch_user_by_id(cashier_id)
             cashier_name = cashier_name['name']
 
         try:
-            self.db.update_sale(sale_id=sale_id, cashier_id=cashier_id, cashier_name=cashier_name, total_amount=total_amount, payment_method=payment_method)
+            self.db.update_sale(sale_id=sale_id, cashier_id=cashier_id, cashier_name=cashier_name, total_amount=total_amount, payment_method=payment_method, status=status)
             self.reload_all_sales()
             self._show_info_message(f"Sale ({sale_id}) has been updated successfully.")
         except Exception as e:
@@ -960,7 +1044,7 @@ class Admin(QMainWindow):
 
 
         # Columns to make non-editable (e.g., ID, Updated At)
-        non_editable_columns = {0, 1, 7}
+        non_editable_columns = {0, 1, 4, 7}
 
         # Populate the table with data
         for row_index, sale in enumerate(self.sales):
@@ -1012,6 +1096,12 @@ class Admin(QMainWindow):
     def _initialize_user_widget(self):
         # Initialize the user widget here
         self.users_table = self.findChild(QTableWidget, 'users_tableWidget')
+        self.user_add_user_button = self.findChild(QPushButton, 'user_add_user_pushButton')
+        self.user_update_user_button = self.findChild(QPushButton, 'user_update_pushButton')
+        self.user_delete_user_button = self.findChild(QPushButton, 'user_delete_pushButton')
+        self.user_reload_user_button = self.findChild(QPushButton, 'user_reload_pushButton')
+        self.user_search_lineedit = self.findChild(QLineEdit, 'user_search_lineEdit')
+        self.user_search_button = self.findChild(QPushButton, 'user_search_pushButton')
 
         # Set the column headers
         self.users_table.setColumnCount(8)
@@ -1019,7 +1109,96 @@ class Admin(QMainWindow):
 
     def _connect_users_signals(self):
         # Connect signals for user management
+        self.user_add_user_button.clicked.connect(self.add_user)
+        self.user_update_user_button.clicked.connect(self.update_user)
+        self.user_delete_user_button.clicked.connect(self.delete_user)
+        self.user_reload_user_button.clicked.connect(self.reload_users_table)
+        self.user_search_button.clicked.connect(self.search_user)
+        self.user_search_lineedit.textChanged.connect(self.search_user)
+        self.users_table.cellClicked.connect(self.enable_user_buttons)
+        self.users_table.cellDoubleClicked.connect(self.edit_user)
+
+        # Disable the Update and Delete buttons until a user is selected
+        self.user_update_user_button.setEnabled(False)
+        self.user_delete_user_button.setEnabled(False)
+
+    def edit_user(self, row, col):
+        # Get role
+        if col == 2:
+            roles = ["Admin", "Cashier", "Manager"]
+            role, ok = QInputDialog.getItem(self, "Role", "Select role:", roles, 0, False)
+            self.users_table.setItem(row, col, QTableWidgetItem(role))
+            if not ok:
+                self._show_error_message("Role selection cancelled.")
+                return
+        # Get status
+        elif col == 5:
+            status = ["Active", "Inactive"]
+            user_status, ok = QInputDialog.getItem(self, "Status", "Select status:", status, 0, False)
+            self.users_table.setItem(row, col, QTableWidgetItem(user_status))
+            if not ok:
+                self._show_error_message("Status selection cancelled.")
+                return
+        else:
+            return
+
+    def enable_user_buttons(self):
+        self.user_update_user_button.setEnabled(True)
+        self.user_delete_user_button.setEnabled(True)
+
+    def add_user(self):
+        # Implement adding a new user here
         pass
+
+    def update_user(self):
+        # Implement updating a user here
+        selected_row = self.users_table.currentRow()
+        if selected_row < 0:
+            self._show_error_message("No selected user.")
+            return
+
+        user_id = self.users_table.item(selected_row, 0).text()
+        user_name = self.users_table.item(selected_row, 1).text()
+        user_role = self.users_table.item(selected_row, 2).text()
+        user_username = self.users_table.item(selected_row, 3).text()
+        user_password = self.users_table.item(selected_row, 4).text()
+        user_status = self.users_table.item(selected_row, 5).text()
+
+        try:
+            self.db.update_user(user_id=user_id, name=user_name, role=user_role, username=user_username, password=user_password, status=user_status)
+            self.reload_all_users()
+            self._show_info_message(f"User ({user_id}) has been updated successfully.")
+        except Exception as e:
+            self._show_error_message(f"Error updating user: {str(e)}")
+        
+    def delete_user(self):
+        # Implement deleting a user here
+        selected_row = self.users_table.currentRow()
+        if selected_row < 0:
+            self._show_error_message("No selected user.")
+            return
+
+        user_id = self.users_table.item(selected_row, 0).text()
+        user_name = self.users_table.item(selected_row, 1).text()
+
+        try:
+            self.db.delete_user(username=user_name)
+            self.reload_all_users()
+            self._show_info_message(f"User ({user_id}) has been deleted successfully.")
+        except Exception as e:
+            self._show_error_message(f"Error deleting user: {str(e)}")
+
+    def search_user(self):
+        search_term = self.user_search_lineedit.text().strip().lower()
+        try:
+            if search_term:
+                self.users = self.db.fetch_users_by_name(search_term)
+            else:
+                self.users = self.db.fetch_all_users()
+            self.reload_users_table()
+        except Exception as e:
+            print(f"Error searching users: {e}")
+            self._show_error_message("Failed to search users.")
 
     def reload_users_table(self):
         self.process_status_label.setText("Reloading users table...")

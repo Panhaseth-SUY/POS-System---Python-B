@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1536</width>
-    <height>960</height>
+    <width>1532</width>
+    <height>825</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -663,8 +663,15 @@ QPushButton:checked{
               <layout class="QVBoxLayout" name="verticalLayout_4">
                <item>
                 <widget class="QLabel" name="user_name">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
                  <property name="font">
                   <font>
+                   <family>.Arial Hebrew Desk Interface</family>
                    <pointsize>20</pointsize>
                    <weight>75</weight>
                    <bold>true</bold>
@@ -739,7 +746,7 @@ QPushButton:checked{
                <property name="maximumSize">
                 <size>
                  <width>50</width>
-                 <height>55</height>
+                 <height>50</height>
                 </size>
                </property>
                <property name="styleSheet">
@@ -749,7 +756,7 @@ QPushButton:checked{
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap>../assets/images/image/Screenshot 2023-10-22 at 4.06.26 in the afternoon.png</pixmap>
+                <pixmap>../assets/icon/smiling.png</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>true</bool>
@@ -789,7 +796,7 @@ QPushButton:checked{
            </rect>
           </property>
           <property name="currentIndex">
-           <number>3</number>
+           <number>5</number>
           </property>
           <widget class="QWidget" name="dashboard_page">
            <widget class="QWidget" name="layoutWidget">
@@ -849,13 +856,13 @@ QPushButton:checked{
             <widget class="QWidget" name="scrollAreaWidgetContents">
              <property name="geometry">
               <rect>
-               <x>8</x>
+               <x>0</x>
                <y>0</y>
-               <width>1185</width>
-               <height>621</height>
+               <width>1183</width>
+               <height>619</height>
               </rect>
              </property>
-             <widget class="QWidget" name="">
+             <widget class="QWidget" name="layoutWidget">
               <property name="geometry">
                <rect>
                 <x>0</x>
@@ -884,7 +891,7 @@ QPushButton:checked{
 
 </string>
                  </property>
-                 <widget class="QWidget" name="">
+                 <widget class="QWidget" name="layoutWidget">
                   <property name="geometry">
                    <rect>
                     <x>10</x>
@@ -1281,7 +1288,7 @@ background-color: none</string>
 
 </string>
                  </property>
-                 <widget class="QWidget" name="">
+                 <widget class="QWidget" name="layoutWidget">
                   <property name="geometry">
                    <rect>
                     <x>10</x>
@@ -2082,7 +2089,7 @@ background-color: none</string>
 
 </string>
                  </property>
-                 <widget class="QWidget" name="">
+                 <widget class="QWidget" name="layoutWidget">
                   <property name="geometry">
                    <rect>
                     <x>10</x>
@@ -2567,7 +2574,7 @@ QTableWidget{
              </column>
             </widget>
            </widget>
-           <widget class="QWidget" name="">
+           <widget class="QWidget" name="layoutWidget">
             <property name="geometry">
              <rect>
               <x>0</x>
@@ -4679,7 +4686,7 @@ QTableWidget{
            </widget>
           </widget>
           <widget class="QWidget" name="user_page">
-           <widget class="QWidget" name="">
+           <widget class="QWidget" name="layoutWidget">
             <property name="geometry">
              <rect>
               <x>0</x>
@@ -4725,7 +4732,7 @@ QTableWidget{
                   <number>20</number>
                  </property>
                  <item>
-                  <widget class="QPushButton" name="add_product_pushButton_2">
+                  <widget class="QPushButton" name="user_add_user_pushButton">
                    <property name="minimumSize">
                     <size>
                      <width>120</width>
@@ -4765,12 +4772,19 @@ QPushButton:checked{
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="update_product_pushButton_2">
+                  <widget class="QPushButton" name="user_update_pushButton">
                    <property name="minimumSize">
                     <size>
                      <width>140</width>
                      <height>0</height>
                     </size>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <pointsize>-1</pointsize>
+                     <weight>75</weight>
+                     <bold>true</bold>
+                    </font>
                    </property>
                    <property name="styleSheet">
                     <string notr="true">QPushButton{
@@ -4803,7 +4817,7 @@ QPushButton:checked{
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="delete_pushButton_2">
+                  <widget class="QPushButton" name="user_delete_pushButton">
                    <property name="minimumSize">
                     <size>
                      <width>100</width>
@@ -4841,7 +4855,7 @@ QPushButton:checked{
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="reload_pushButton_3">
+                  <widget class="QPushButton" name="user_reload_pushButton">
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
@@ -4897,7 +4911,7 @@ QPushButton:checked{
                   <number>-1</number>
                  </property>
                  <item>
-                  <widget class="QLineEdit" name="search_product_lineEdit_2">
+                  <widget class="QLineEdit" name="user_search_lineEdit">
                    <property name="minimumSize">
                     <size>
                      <width>200</width>
@@ -4917,7 +4931,7 @@ QPushButton:checked{
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="search_product_pushButton_2">
+                  <widget class="QPushButton" name="user_search_pushButton">
                    <property name="styleSheet">
                     <string notr="true">QPushButton{
 	border: none;
@@ -4947,6 +4961,11 @@ QPushButton:checked{
              </item>
              <item>
               <widget class="QTableWidget" name="users_tableWidget">
+               <property name="font">
+                <font>
+                 <pointsize>13</pointsize>
+                </font>
+               </property>
                <property name="styleSheet">
                 <string notr="true">QHeaderView::section{
 	font-weight: bold;

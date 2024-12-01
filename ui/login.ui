@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1536</width>
-    <height>960</height>
+    <height>825</height>
    </rect>
   </property>
   <property name="cursor">
@@ -23,343 +23,507 @@
    <bool>false</bool>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: lightgray;</string>
+   <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
     <string notr="true">background-color: black;</string>
    </property>
-   <widget class="QFrame" name="frame">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>-1</x>
-      <y>-21</y>
-      <width>771</width>
-      <height>981</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: white; </string>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::StyledPanel</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Raised</enum>
-    </property>
-    <widget class="QLabel" name="label">
-     <property name="geometry">
-      <rect>
-       <x>60</x>
-       <y>920</y>
-       <width>165</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>18</pointsize>
-      </font>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">color: gray;</string>
-     </property>
-     <property name="text">
-      <string>We are by your side.</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_2">
-     <property name="geometry">
-      <rect>
-       <x>200</x>
-       <y>310</y>
-       <width>371</width>
-       <height>331</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="pixmap">
-      <pixmap>../resources/image/warehouse_logistic.png</pixmap>
-     </property>
-     <property name="scaledContents">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_4">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>60</y>
-       <width>45</width>
-       <height>45</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true"/>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="pixmap">
-      <pixmap>../resources/image/security_icon.png</pixmap>
-     </property>
-     <property name="scaledContents">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_3">
-     <property name="geometry">
-      <rect>
-       <x>100</x>
-       <y>80</y>
-       <width>60</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>18</pointsize>
-      </font>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">color: black;</string>
-     </property>
-     <property name="text">
-      <string>Verified</string>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QFrame" name="frame_2">
-    <property name="geometry">
-     <rect>
-      <x>770</x>
+      <x>0</x>
       <y>0</y>
-      <width>781</width>
-      <height>961</height>
+      <width>1531</width>
+      <height>963</height>
      </rect>
     </property>
-    <property name="autoFillBackground">
-     <bool>false</bool>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color:rgb(174, 174, 172);</string>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::StyledPanel</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Raised</enum>
-    </property>
-    <widget class="QWidget" name="horizontalLayoutWidget_2">
-     <property name="geometry">
-      <rect>
-       <x>210</x>
-       <y>490</y>
-       <width>451</width>
-       <height>81</height>
-      </rect>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>0</number>
      </property>
-     <layout class="QHBoxLayout" name="password_horizontalLayout">
-      <item>
-       <widget class="QLabel" name="password_label">
+     <item>
+      <widget class="QWidget" name="widget_2" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>681</width>
+         <height>961</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>961</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(122, 122, 122)</string>
+       </property>
+       <widget class="QWidget" name="widget" native="true">
+        <property name="geometry">
+         <rect>
+          <x>-20</x>
+          <y>0</y>
+          <width>765</width>
+          <height>961</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>681</width>
+          <height>961</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>961</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: lightgray;</string>
+        </property>
+        <widget class="QLabel" name="label_4">
+         <property name="geometry">
+          <rect>
+           <x>61</x>
+           <y>883</y>
+           <width>671</width>
+           <height>26</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>22</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border: none;
+background-color: none;</string>
+         </property>
+         <property name="text">
+          <string>We are by your side</string>
+         </property>
+        </widget>
+        <widget class="QWidget" name="layoutWidget">
+         <property name="geometry">
+          <rect>
+           <x>40</x>
+           <y>30</y>
+           <width>701</width>
+           <height>51</height>
+          </rect>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="minimumSize">
+             <size>
+              <width>35</width>
+              <height>35</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>40</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">border: none; 
+background-color: none;</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap>../assets/images/image/security_icon.png</pixmap>
+            </property>
+            <property name="scaledContents">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_2">
+            <property name="font">
+             <font>
+              <pointsize>22</pointsize>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">border: none;
+background-color: none;</string>
+            </property>
+            <property name="text">
+             <string>Secured</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="layoutWidget">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>250</y>
+           <width>751</width>
+           <height>402</height>
+          </rect>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QLabel" name="label_3">
+            <property name="minimumSize">
+             <size>
+              <width>400</width>
+              <height>400</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>400</width>
+              <height>400</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">border: none; 
+background-color: none;</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap>../assets/images/image/warehouse_logistic.png</pixmap>
+            </property>
+            <property name="scaledContents">
+             <bool>true</bool>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+       <widget class="QLabel" name="label_5">
+        <property name="geometry">
+         <rect>
+          <x>750</x>
+          <y>100</y>
+          <width>781</width>
+          <height>75</height>
+         </rect>
+        </property>
         <property name="font">
          <font>
-          <family>Arial</family>
-          <pointsize>18</pointsize>
+          <pointsize>62</pointsize>
           <weight>75</weight>
           <bold>true</bold>
          </font>
         </property>
         <property name="styleSheet">
-         <string notr="true">color: black;</string>
+         <string notr="true">border: none;
+background-color: none;
+color: rgb(250, 250, 250);</string>
         </property>
         <property name="text">
-         <string>Password: </string>
+         <string>TOKATA POS-SYSTEM</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="password_lineEdit">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>2</verstretch>
-         </sizepolicy>
+       <widget class="QLabel" name="label_9">
+        <property name="geometry">
+         <rect>
+          <x>800</x>
+          <y>180</y>
+          <width>671</width>
+          <height>101</height>
+         </rect>
         </property>
         <property name="font">
          <font>
-          <family>Arial</family>
-          <pointsize>14</pointsize>
+          <pointsize>16</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="styleSheet">
-         <string notr="true">border-radius: 15px; 
-height: 40px; 
-background-color: white;
-color: black; padding-left: 10px;</string>
+         <string notr="true">border: none;
+background-color: none;
+color: rgba(255, 255, 255, 176);</string>
         </property>
-        <property name="placeholderText">
-         <string>Enter your password</string>
+        <property name="text">
+         <string>     This system streamlines sales, tracks inventory, manages payments, and generates reports, making business operations more efficient and customer transactions seamless.</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="indent">
+         <number>20</number>
         </property>
        </widget>
-      </item>
-     </layout>
-    </widget>
-    <widget class="QWidget" name="horizontalLayoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>210</x>
-       <y>410</y>
-       <width>451</width>
-       <height>80</height>
-      </rect>
-     </property>
-     <layout class="QHBoxLayout" name="username_horizontalLayout">
-      <item>
-       <widget class="QLabel" name="username_label">
+       <widget class="QPushButton" name="login_pushButton">
+        <property name="geometry">
+         <rect>
+          <x>1070</x>
+          <y>690</y>
+          <width>190</width>
+          <height>50</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>190</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>190</width>
+          <height>50</height>
+         </size>
+        </property>
         <property name="font">
          <font>
-          <family>Arial</family>
-          <pointsize>18</pointsize>
+          <pointsize>16</pointsize>
           <weight>75</weight>
           <bold>true</bold>
          </font>
         </property>
         <property name="styleSheet">
-         <string notr="true">color: black;</string>
+         <string notr="true">background-color: black;
+color: white;
+border: 1px solid gray;
+border-radius: 5px;</string>
         </property>
         <property name="text">
-         <string>Username: </string>
+         <string>Login</string>
         </property>
        </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="username_lineEdit">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+       <widget class="QCommandLinkButton" name="forgot_password_commandLinkButton">
+        <property name="geometry">
+         <rect>
+          <x>790</x>
+          <y>870</y>
+          <width>193</width>
+          <height>41</height>
+         </rect>
         </property>
         <property name="font">
          <font>
-          <family>Arial</family>
+          <pointsize>16</pointsize>
+          <underline>true</underline>
+         </font>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: blue;
+background-color: none;
+border: none;</string>
+        </property>
+        <property name="text">
+         <string>Forgot password?</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>../assets/icon/link.png</normaloff>../assets/icon/link.png</iconset>
+        </property>
+        <property name="description">
+         <string>This link will load you to a page to request for change old password to new password if you're are the authorized user.</string>
+        </property>
+       </widget>
+       <widget class="QWidget" name="layoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>750</x>
+          <y>340</y>
+          <width>781</width>
+          <height>301</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <property name="spacing">
+          <number>60</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_6">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>70</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>34</pointsize>
+             <weight>50</weight>
+             <bold>false</bold>
+             <underline>false</underline>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">border: none;
+background-color: none;
+color: rgb(250, 250, 250);</string>
+           </property>
+           <property name="text">
+            <string>Authentication System</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <property name="spacing">
+            <number>-1</number>
+           </property>
+           <property name="leftMargin">
+            <number>100</number>
+           </property>
+           <property name="rightMargin">
+            <number>100</number>
+           </property>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <item>
+              <widget class="QLabel" name="label_7">
+               <property name="font">
+                <font>
+                 <pointsize>26</pointsize>
+                 <weight>50</weight>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">border: none;
+background-color: none;
+color: rgb(250, 250, 250);</string>
+               </property>
+               <property name="text">
+                <string>Username:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="username_lineEdit">
+               <property name="minimumSize">
+                <size>
+                 <width>300</width>
+                 <height>44</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>400</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: white;
+border: 1px solid gray;
+border-radius: 10px;
+padding-left: 10px;</string>
+               </property>
+               <property name="placeholderText">
+                <string>Input your username here...</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <item>
+              <widget class="QLabel" name="label_8">
+               <property name="font">
+                <font>
+                 <pointsize>26</pointsize>
+                 <weight>50</weight>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">border: none;
+background-color: none;
+color: rgb(250, 250, 250);</string>
+               </property>
+               <property name="text">
+                <string>Password:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="password_lineEdit">
+               <property name="minimumSize">
+                <size>
+                 <width>300</width>
+                 <height>44</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>400</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: white;
+border: 1px solid gray;
+border-radius: 10px;
+padding-left: 10px;</string>
+               </property>
+               <property name="placeholderText">
+                <string>Input your password here...</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QCheckBox" name="show_password_checkBox">
+        <property name="geometry">
+         <rect>
+          <x>1300</x>
+          <y>640</y>
+          <width>131</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
           <pointsize>14</pointsize>
          </font>
         </property>
         <property name="styleSheet">
-         <string notr="true">border-radius: 15px; 
-height: 40px; 
-background-color: white;
-color: black;padding-left: 10px;</string>
+         <string notr="true">color: rgb(250, 250, 250);</string>
         </property>
         <property name="text">
-         <string/>
-        </property>
-        <property name="cursorPosition">
-         <number>0</number>
-        </property>
-        <property name="placeholderText">
-         <string>Enter your username </string>
+         <string>Show password</string>
         </property>
        </widget>
-      </item>
-     </layout>
-    </widget>
-    <widget class="QLabel" name="login_label">
-     <property name="geometry">
-      <rect>
-       <x>350</x>
-       <y>280</y>
-       <width>158</width>
-       <height>27</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>24</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">color: black;</string>
-     </property>
-     <property name="text">
-      <string>Login System</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="enter_pushButton">
-     <property name="geometry">
-      <rect>
-       <x>380</x>
-       <y>620</y>
-       <width>121</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: black; color: white; font: bold; border-radius: 5px; font-size: 14px;</string>
-     </property>
-     <property name="text">
-      <string>Enter</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="forgot_password_label">
-     <property name="geometry">
-      <rect>
-       <x>60</x>
-       <y>880</y>
-       <width>145</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>18</pointsize>
-       <italic>true</italic>
-      </font>
-     </property>
-     <property name="cursor">
-      <cursorShape>PointingHandCursor</cursorShape>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">color: blue;</string>
-     </property>
-     <property name="text">
-      <string>Forgot password?</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="title_label">
-     <property name="geometry">
-      <rect>
-       <x>170</x>
-       <y>150</y>
-       <width>515</width>
-       <height>54</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>48</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">color: black;</string>
-     </property>
-     <property name="text">
-      <string>TOKATA POS SYSTEM</string>
-     </property>
-    </widget>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
  </widget>
