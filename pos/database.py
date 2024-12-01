@@ -250,7 +250,7 @@ class Database:
             self.execute_query(query, params)
             print(f"-->{username} has been deleted successfully!")
         except Exception as e:
-            print(f"--> Error deleting user: {e}")
+           print(f"--> Error deleting user: {e}")
 
     def is_user_referenced(self, username):
         # Check if the user is referenced in the sales table
@@ -566,10 +566,8 @@ class Database:
     # Add categories from dataset (csv, excel)
     def add_categories_from_dataset(self):
         # Ask the user to select a dataset file
-        app = QApplication([])
         options = QFileDialog.Options()
         dataset, _ = QFileDialog.getOpenFileName(None, "Select Dataset", "", "CSV Files (*.csv);;Excel Files (*.xlsx)", options=options)
-        app.exit()
         
         # Check for file type
         if dataset.endswith(".csv"):
@@ -579,6 +577,7 @@ class Database:
                     self.add_category(row["name"], row.get("description", None))
             except Exception as e:
                 print(f"--> Error adding categories from dataset: {e}")
+                raise Exception(f"Error adding categories from dataset: {e}")
                 
         elif dataset.endswith(".xlsx"):
             try:
@@ -587,6 +586,7 @@ class Database:
                     self.add_category(row["name"], row.get("description", None))
             except Exception as e:
                 print(f"--> Error adding categories from dataset: {e}")
+                raise Exception(f"Error adding categories from dataset: {e}")
         else:
             print("--> Invalid file type. Only csv, and excel files are supported.")
 
@@ -644,20 +644,26 @@ class Database:
             return None
 
     # Update a category
-    def update_category(self, category_id, name, description=None):
-        query = "UPDATE categories SET name=%s"
-        params = [name]
+    def update_category(self, category_id, name=None, description=None, isDeleted=None):
+        query = "UPDATE categories SET "
+        params = []
 
+        if name:
+            query += "name=%s, "
+            params.append(name)
+        if isDeleted is not None:
+            query += "isDeleted=%s, "
+            params.append(isDeleted)
         if description:
-            query += ", description=%s"
+            query += "description=%s, "
             params.append(description)
 
-        query += " WHERE id=%s"
+        query = query.rstrip(", ") + " WHERE id=%s"
         params.append(category_id)
 
         try:
             self.execute_query(query, params)
-            print(f"-->Category: ({name}) has been updated successfully!")
+            print(f"-->Category: ({category_id}) has been updated successfully!")
         except Exception as e:
             print(f"--> Error updating category: {e}")
 
@@ -681,6 +687,17 @@ class Database:
         except Exception as e:
             print(f"--> Error soft deleting category: {e}")
 
+    # check if category references in products table
+    def is_category_referenced(self, category_id):
+        query = "SELECT COUNT(*) as count FROM products WHERE category_id = %s"
+        params = (category_id,)
+        try:
+            result = self.execute_query(query, params, fetchone=True)
+            return result['count'] > 0
+        except Exception as e:
+            print(f"--> Error checking if category is referenced: {e}")
+            return False
+        
     # Clear all categories
     def clear_all_categories(self):
         query = "DELETE FROM categories"

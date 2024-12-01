@@ -796,7 +796,7 @@ QPushButton:checked{
            </rect>
           </property>
           <property name="currentIndex">
-           <number>5</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="dashboard_page">
            <widget class="QWidget" name="layoutWidget">
@@ -856,10 +856,10 @@ QPushButton:checked{
             <widget class="QWidget" name="scrollAreaWidgetContents">
              <property name="geometry">
               <rect>
-               <x>0</x>
+               <x>8</x>
                <y>0</y>
-               <width>1183</width>
-               <height>619</height>
+               <width>1185</width>
+               <height>621</height>
               </rect>
              </property>
              <widget class="QWidget" name="layoutWidget">
@@ -2458,7 +2458,7 @@ background-color: none</string>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_59">
                 <item>
-                 <widget class="QLineEdit" name="pos_search_lineEdit_2">
+                 <widget class="QLineEdit" name="category_product_search_lineEdit">
                   <property name="minimumSize">
                    <size>
                     <width>200</width>
@@ -2478,7 +2478,7 @@ background-color: none</string>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="pos_search_pushButton_2">
+                 <widget class="QPushButton" name="category_product_search_pushButton">
                   <property name="styleSheet">
                    <string notr="true">QPushButton{
 	border: none;
@@ -2617,7 +2617,7 @@ QTableWidget{
                   <number>20</number>
                  </property>
                  <item>
-                  <widget class="QPushButton" name="add_product_pushButton_3">
+                  <widget class="QPushButton" name="add_category_pushButton">
                    <property name="minimumSize">
                     <size>
                      <width>120</width>
@@ -2657,7 +2657,7 @@ QPushButton:checked{
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="update_product_pushButton_3">
+                  <widget class="QPushButton" name="update_category_pushButton">
                    <property name="minimumSize">
                     <size>
                      <width>140</width>
@@ -2695,7 +2695,7 @@ QPushButton:checked{
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="import_excel_pushButton_3">
+                  <widget class="QPushButton" name="import_excel_category_pushButton">
                    <property name="minimumSize">
                     <size>
                      <width>130</width>
@@ -2744,7 +2744,7 @@ QPushButton:checked{
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="delete_pushButton_3">
+                  <widget class="QPushButton" name="delete_category_pushButton">
                    <property name="minimumSize">
                     <size>
                      <width>100</width>

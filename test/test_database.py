@@ -37,7 +37,7 @@ if __name__ == '__main__':
     # db.update_user('admin', 'TOKATA-UPDATE', 'admin', 'admin')
 
     # delete a user
-    # db.delete_user('admin')
+    # db.delete_user('kjdfladfd')
 
     # clear all users except admin
     # db.clear_all_users()
@@ -69,8 +69,9 @@ if __name__ == '__main__':
     # fetch a category by id
     # pprint(db.fetch_category_by_id(1))
 
-    # update a category
-    # db.update_category(1, "Snack-UPDATE")
+    # # update a category
+    # db.update_category(8, isDeleted=0)
+    # db.update_category(9, isDeleted=0)
 
     # delete a category
     # db.delete_category(1)

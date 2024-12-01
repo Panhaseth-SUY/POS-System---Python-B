@@ -10,6 +10,8 @@ import pandas as pd
 from database import Database
 from sale_report_generator import SaleReportGenerator
 from add_product_dialog import AddProductDialog
+from add_category_dialog import AddCategoryDialog
+from add_user_dialog import AddUserDialog
 from invoice_generator import InvoiceGenerator
 
 class Admin(QMainWindow):
@@ -314,7 +316,12 @@ class Admin(QMainWindow):
         self.categories_table = self.findChild(QTableWidget, 'category_tableWidget')
         self.category_products_table = self.findChild(QTableWidget, 'category_product_tableWidget')
         self.category_products_label = self.findChild(QLabel, 'category_products_label')
-
+        self.add_category_button = self.findChild(QPushButton, 'add_category_pushButton')
+        self.update_category_button = self.findChild(QPushButton, 'update_category_pushButton')
+        self.import_category_excel_data = self.findChild(QPushButton, 'import_excel_category_pushButton')
+        self.delete_category_button = self.findChild(QPushButton, 'delete_category_pushButton')
+        self.category_products_search_lineedit = self.findChild(QLineEdit, 'category_product_search_lineEdit')
+        self.category_products_search_button = self.findChild(QPushButton, 'category_product_search_pushButton')
 
         # Set the column headers for categories table
         self.categories_table.setColumnCount(5)
@@ -340,6 +347,79 @@ class Admin(QMainWindow):
     def _connect_category_signals(self):
         # Connect signals for category management
         self.categories_table.cellClicked.connect(lambda row, column: self.reload_category_products(self.categories_table.item(row, 0).text()))
+        self.add_category_button.clicked.connect(self.add_category)
+        self.update_category_button.clicked.connect(self.update_category)
+        self.import_category_excel_data.clicked.connect(self.import_category_excel)
+        self.delete_category_button.clicked.connect(self.delete_category)
+        self.category_products_search_button.clicked.connect(self.search_category_products)
+        self.category_products_search_lineedit.textChanged.connect(self.search_category_products)
+
+    def add_category(self):
+        self.add_category_dialog = AddCategoryDialog(self, self.db)
+        self.add_category_dialog.exec_()
+        self.reload_all_categories()
+
+    def update_category(self):
+        selected_row = self.categories_table.currentRow()
+        if selected_row < 0:
+            self._show_error_message("No category selected.")
+            return
+        category_id = self.categories_table.item(selected_row, 0).text()
+        category_name = self.categories_table.item(selected_row, 1).text()
+        category_description = self.categories_table.item(selected_row, 2).text()
+
+        try:
+            self.db.update_category(category_id=category_id, name=category_name, description=category_description)
+            self.reload_all_categories()
+            self._show_info_message(f"Category ({category_name}-{category_id}) has been updated successfully.")
+            self.category_products_label.setText(f"Products for category ({category_name}-{category_id}):")
+        except Exception as e:
+            print(f"Error updating category: {e}")
+            self._show_error_message("Failed to update category.")
+            self.category_products_label.setText("")
+        
+    def import_category_excel(self):
+        try:
+            self.db.add_categories_from_dataset()
+            self.reload_all_categories()
+            self._show_info_message("Categories imported from Excel successfully.")
+        except Exception as e:
+            print(f"Error importing categories from Excel: {e}")
+            self._show_error_message("Failed to import categories from Excel. {e}")
+
+    def delete_category(self):
+        selected_row = self.categories_table.currentRow()
+        if selected_row < 0:
+            self._show_error_message("No category selected.")
+            return
+        category_id = self.categories_table.item(selected_row, 0).text()
+        category_name = self.categories_table.item(selected_row, 1).text()
+
+        try:
+            if self.db.is_category_referenced(category_id):
+                self._show_error_message("Cannot delete category. It is referenced by products.")
+                return  # Skip deletion if category is referenced by products
+            else:
+                self.db.delete_category(category_id)
+            self.reload_all_categories()
+            self._show_info_message(f"Category ({category_name}-{category_id}) has been deleted successfully.")
+            self.category_products_label.setText("")
+        except Exception as e:
+            print(f"Error deleting category: {e}")
+            self._show_error_message("Failed to delete category.")
+            self.category_products_label.setText("") 
+
+    def search_category_products(self):
+        search_term = self.category_products_search_lineedit.text().strip().lower()
+        try:
+            if search_term:
+                self.category_products = self.db.search_products_by_name(search_term)
+            else:
+                self.category_products = self.db.fetch_products_by_category(self.categories_table.item(self.categories_table.currentRow(), 0).text())
+            self.reload_category_products(self.categories_table.item(self.categories_table.currentRow(), 0).text())
+        except Exception as e:
+            print(f"Error searching category products: {e}")
+            self._show_error_message("Failed to search category products.")
 
     def reload_all_categories(self):
         self.process_status_label.setText("Reloading categories table...")
@@ -1128,6 +1208,7 @@ class Admin(QMainWindow):
             roles = ["Admin", "Cashier", "Manager"]
             role, ok = QInputDialog.getItem(self, "Role", "Select role:", roles, 0, False)
             self.users_table.setItem(row, col, QTableWidgetItem(role))
+            self.update_user()
             if not ok:
                 self._show_error_message("Role selection cancelled.")
                 return
@@ -1136,6 +1217,7 @@ class Admin(QMainWindow):
             status = ["Active", "Inactive"]
             user_status, ok = QInputDialog.getItem(self, "Status", "Select status:", status, 0, False)
             self.users_table.setItem(row, col, QTableWidgetItem(user_status))
+            self.update_user()
             if not ok:
                 self._show_error_message("Status selection cancelled.")
                 return
@@ -1147,8 +1229,9 @@ class Admin(QMainWindow):
         self.user_delete_user_button.setEnabled(True)
 
     def add_user(self):
-        # Implement adding a new user here
-        pass
+        self.add_user_dialog = AddUserDialog(self, self.db)
+        self.add_user_dialog.exec_()
+        self.reload_all_users()
 
     def update_user(self):
         # Implement updating a user here
@@ -1172,17 +1255,17 @@ class Admin(QMainWindow):
             self._show_error_message(f"Error updating user: {str(e)}")
         
     def delete_user(self):
-        # Implement deleting a user here
+        """Delete the selected user."""
         selected_row = self.users_table.currentRow()
         if selected_row < 0:
-            self._show_error_message("No selected user.")
+            self._show_error_message("No user selected.")
             return
 
         user_id = self.users_table.item(selected_row, 0).text()
-        user_name = self.users_table.item(selected_row, 1).text()
+        username = self.users_table.item(selected_row, 3).text()
 
         try:
-            self.db.delete_user(username=user_name)
+            self.db.delete_user(username=username)
             self.reload_all_users()
             self._show_info_message(f"User ({user_id}) has been deleted successfully.")
         except Exception as e:
