@@ -98,13 +98,13 @@
     4. button for cart table operations
         1. clear product
         2. delete product
-        3. generate invoice 
+        3. generate pdf invoice 
 5. sales page
     1. button for sales page operations
         1. filter sales by date
         2. update sales
         3. import excel
-        4. export pdf salse reports
+        4. generate pdf salse reports
         5. delete, reload, and search sales
     2. sales table 
 5. user page
@@ -126,10 +126,39 @@
     2. user roles
 2. category table
     1. category info
-    2. 
+    2. category status
 3. product table
+    1. products info
+    2. sku and barcode
+    3. category id reference
 4. sales table
+    1. sales info
+    2. cashier id reference
 5. sale items table
+    1. sale items info
+    2. product id reference
+    3. sale id reference
+
+# Installing Dependencies (For Mac User)
+## Install Python and PIP
+1. Install Homebrew: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+2. Install Python: brew install python
+3. Check versions: 
+    python3 --version
+    pip3 --version
+## Set Up a Virtual Environment
+1. python3 -m venv venv
+2. source venv/bin/activate
+## Install Dependencies
+1. pip install <package_name>
+2. pip install -r requirements.txt
+## Manage Dependencies
+1. pip freeze > requirements.txt
+2. pip list
+## Deactivate Virtual Environment
+1. deactivate
+## Check all requirement packages in the requirements.txt
 
 
 

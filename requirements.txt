@@ -1,0 +1,9 @@
+pyqt5
+pandas
+datetime
+collections
+hashlib
+mysql-connector-python
+sys
+os
+reportlab
