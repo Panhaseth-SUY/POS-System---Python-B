@@ -442,6 +442,15 @@ class Database:
             print(f"--> Error searching products by name: {e}")
             return None
 
+    def search_products_by_name_and_category_id(self, name, category_id):
+        query = "SELECT * FROM products WHERE isDeleted=False AND category_id=%s AND name LIKE %s"
+        params = (category_id, f"%{name}%")
+        try:
+            results = self.execute_query(query, params, fetchall=True)
+            return results
+        except Exception as e:
+            print(f"--> Error searching products by name and category ID: {e}")
+            return None
     # Fetch a product by ID
     def fetch_product_by_id(self, product_id):
         query = "SELECT * FROM products WHERE isDeleted=False AND id=%s"

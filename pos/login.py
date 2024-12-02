@@ -40,7 +40,6 @@ class Login(QMainWindow):
 
         # Set the focus to the username line edit
         self.username_lineEdit.setFocus()
-        self.password_lineEdit.setFocus()
 
         # Connect signals and slots
         self.login_pushButton.clicked.connect(self.authentication)

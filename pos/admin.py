@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (
     QMainWindow, QApplication, QPushButton, QStackedWidget, QLabel, QTableWidget, QTableWidgetItem, QLineEdit,
-    QMessageBox, QComboBox, QSpinBox, QInputDialog, QHeaderView, QAbstractItemView
+    QMessageBox, QComboBox, QSpinBox, QInputDialog, QHeaderView, QAbstractItemView, QDateEdit
 )
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
@@ -412,11 +412,14 @@ class Admin(QMainWindow):
     def search_category_products(self):
         search_term = self.category_products_search_lineedit.text().strip().lower()
         try:
-            if search_term:
-                self.category_products = self.db.search_products_by_name(search_term)
+            category_id = self.categories_table.item(self.categories_table.currentRow(), 0).text()
+            if self.categories_table.currentRow() < 0:
+                raise Exception("There is no row selection")
+            elif search_term:
+                self.category_products = self.db.search_products_by_name_and_category_id(name=search_term, category_id=category_id)
             else:
-                self.category_products = self.db.fetch_products_by_category(self.categories_table.item(self.categories_table.currentRow(), 0).text())
-            self.reload_category_products(self.categories_table.item(self.categories_table.currentRow(), 0).text())
+                self.category_products = self.db.fetch_products_by_category(category_id)
+            self.reload_category_products_table(category_id)
         except Exception as e:
             print(f"Error searching category products: {e}")
             self._show_error_message("Failed to search category products.")
@@ -444,15 +447,13 @@ class Admin(QMainWindow):
         self.categories_table.setSortingEnabled(True)
         self.process_status_label.setText("Categories table loaded successfully.")
 
-    def reload_category_products(self, category_id):
+    def reload_category_products_table(self, category_id):
         self.process_status_label.setText("Reloading category products table...")
         # clear all category products
         self.category_products_table.clearContents()
         self.category_products_table.setRowCount(0)
         self.category_products_table.setSortingEnabled(False)  # Disable sorting for performance optimization
 
-        # Fetch all category products and populate the table
-        self.category_products = self.db.fetch_products_by_category(category_id)
         for product in self.category_products:
             row_count = self.category_products_table.rowCount()
             self.category_products_table.insertRow(row_count)
@@ -465,9 +466,15 @@ class Admin(QMainWindow):
         # Enable sorting after populating the table
         self.category_products_table.setSortingEnabled(True)
         self.process_status_label.setText("Category products table loaded successfully.")
-        self.category_products_label.setText(f"Category: {self.db.fetch_category_by_id(category_id)['name']}")
+        if category_id:
+            self.category_products_label.setText(f"Category: {self.db.fetch_category_by_id(category_id)['name']}")
+        else: 
+            pass
 
-
+    def reload_category_products(self, category_id):
+        # Fetch all category products and populate the table
+        self.category_products = self.db.fetch_products_by_category(category_id)
+        self.reload_category_products_table(category_id)
 
     #! Product Management Functions =======================================================================
     def _initialize_product_widget(self):
@@ -980,8 +987,8 @@ class Admin(QMainWindow):
     #! Sale Management Functions ==========================================================================
     def _initialize_sale_widget(self):
         # Initialize the sale widget here
-        self.date_start = self.findChild(QLabel, 'date_start_dateEdit')
-        self.date_end = self.findChild(QLabel, 'date_end_dateEdit')
+        self.date_start = self.findChild(QDateEdit, 'date_start_dateEdit')
+        self.date_end = self.findChild(QDateEdit, 'date_end_dateEdit')
         self.update_sale_button = self.findChild(QPushButton, 'update_sale_pushButton')
         self.sale_import_excel_button = self.findChild(QPushButton, 'sale_import_excel_pushButton')
         self.sale_pdf_report_button = self.findChild(QPushButton, 'pdf_report_pushButton')
@@ -1001,6 +1008,21 @@ class Admin(QMainWindow):
         self.search_sale_button.clicked.connect(self.search_sales)
         self.search_sale_lineedit.textChanged.connect(self.search_sales)
         self.sales_table.cellDoubleClicked.connect(lambda row, col: self.edit_sale(row, col))
+        self.date_end.dateChanged.connect(self.reload_sales_by_date_range)
+        self.date_start.dateChanged.connect(self.reload_sales_by_date_range)
+
+    def reload_sales_by_date_range(self):
+        date_start = self.date_start.date().toString("yyyy-MM-dd")
+        date_end = self.date_end.date().toString("yyyy-MM-dd")
+
+        date_start = f"{date_start} 00:00:00"
+        date_end = f"{date_end} 23:59:59"
+
+        if date_start <= date_end:
+            self.sales = self.db.fetch_sales_by_date_range(date_start, date_end)
+            self.reload_sales_table()
+        else:
+            self._show_error_message("Invalid date range.")
 
     def edit_sale(self, row, col):
         # Get total amount of sales
@@ -1074,7 +1096,7 @@ class Admin(QMainWindow):
 
     def generate_pdf_report(self):
         try: 
-            SaleReportGenerator(date_start="2015-01-01", date_end="2023-12-31", Database=self.db)
+            SaleReportGenerator(data=self.sales, database=self.db)
             self._show_info_message("PDF report generated successfully.")
         except Exception as e:
             self._show_error_message(f"Error generating PDF report: {str(e)}")

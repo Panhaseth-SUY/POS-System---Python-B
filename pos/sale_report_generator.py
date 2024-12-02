@@ -16,23 +16,24 @@ from collections import defaultdict
 
 
 class SaleReportGenerator:
-    def __init__(self, all_sale=False, date_start=None, date_end=None, Database=Database()):
-        self.db = Database
-        self.generate(all_sale, date_start, date_end)
+    def __init__(self, data=None, database=None):
+        if database:
+            self.db = database
+        else: 
+            self.db = Database()
+        self.generate(data)
 
     # Generate sales report as PDF (Main Method)
-    def generate(self, all_sale=False, date_start=None, date_end=None):
+    def generate(self, data):
         # Fetch sales data
-        if all_sale:
-            data = self.fetch_all_sales()
-        else:
-            date_start = date_start + " 00:00:00"
-            date_end = date_end + " 23:59:59"
-            data = self.db.fetch_sales_by_date_range(date_start, date_end)
-        if not data:
-            print("No sales data available for the specified period.")
-            return
-
+        try:
+            if not data:
+                data = self.fetch_all_sales()
+            else:
+                data = data
+        except Exception as e:
+            raise Exception("Error fetching data from database")
+        
         # File save dialog
         filename = self.sale_report_file_path()
         if not filename:
