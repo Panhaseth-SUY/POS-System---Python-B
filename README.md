@@ -1,7 +1,8 @@
 # How to Run this application
-1. Go to folder: pos_system/pos
-2. Find file login.py 
-3. Run login.py
+1. Go to pos_system/pos/databse.py
+2. Set up your database username, password, etc.
+3. Go to folder: pos_system/pos/login.py 
+4. Run login.py
 
 # Project Structure
 ## There is 4 folders and README.md in the project:
