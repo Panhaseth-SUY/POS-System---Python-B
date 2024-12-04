@@ -6,7 +6,7 @@ import datetime
 from datetime import datetime
 from collections import defaultdict
 class Database:
-    def __init__(self, host="192.168.2.93", username="root", password="Tokata@se7en232722", database="POS_DB"):
+    def __init__(self, host="fill_your_host", username="fill_your_username", password="fill_your_password", database="fill_your_database"):
         self.host = host
         self.username = username
         self.password = password
