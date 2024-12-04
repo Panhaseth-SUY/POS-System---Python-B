@@ -1,12 +1,12 @@
 import hashlib
 import mysql.connector
 import pandas as pd
-from PyQt5.QtWidgets import QApplication, QFileDialog
+from PyQt5.QtWidgets import QFileDialog
 import datetime
 from datetime import datetime
 from collections import defaultdict
 class Database:
-    def __init__(self, host="127.0.0.1", username="root", password="Tokata@se7en232722", database="POS_DB"):
+    def __init__(self, host="192.168.2.93", username="root", password="Tokata@se7en232722", database="POS_DB"):
         self.host = host
         self.username = username
         self.password = password
@@ -16,6 +16,9 @@ class Database:
         self.cursor = None
 
         self.connect_db()
+
+        # Add a admin user
+        self.add_user("Admin", "admin", "admin", "Admin")
 
     # Connect to the database (Establish self.conn with database).
     def connect_db(self):
@@ -1044,7 +1047,7 @@ class Database:
         print("Database connection closed successfully!")
 
 if __name__ == "__main__":
-    db = Database(host="127.0.0.1", username="root", password="Tokata@se7en232722", database="POS_DB")
+    db = Database()
 
     # Initialize all tables if they don't exist yet
     db.initialize_tables()
